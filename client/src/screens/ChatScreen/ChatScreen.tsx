@@ -1,5 +1,5 @@
 import { Colors } from "@/utils";
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import {
   Button,
   Pressable,
@@ -8,13 +8,24 @@ import {
   TextInput,
   View,
 } from "react-native";
-import { Message } from "./components";
+import { Message as MessageComponent } from "./components";
 import { Formik } from "formik";
 import IconButton from "./components/IconButton/IconButton";
+import { ScrollView } from "react-native-gesture-handler";
+import { Message } from "@/utils/types";
 
 type Props = {};
 
 const ChatScreen = (props: Props) => {
+  const messagesRef = useRef<ScrollView>(null);
+  const [messages, setMessages] = React.useState<Message[]>([]);
+
+  useEffect(() => {
+    if (messagesRef.current) {
+      messagesRef.current.scrollToEnd({ animated: false });
+    }
+  }, []);
+
   return (
     <View style={styles.chatScreen}>
       <Formik
@@ -31,21 +42,28 @@ const ChatScreen = (props: Props) => {
               placeholderTextColor={Colors["yellow500"]}
               value={values.message}
             />
-            <IconButton onPress={handleSubmit} color={Colors["yellow500"]} size={32} />
+            <IconButton
+              onPress={handleSubmit}
+              color={Colors["yellow500"]}
+              size={32}
+            />
           </View>
         )}
       </Formik>
-      <View style={styles.messages}>
-        <Message isUser={true} messageText="Hey!" />
-        <Message isUser={false} messageText="Hey!" />
-        <Message isUser={true} messageText="Hey!" />
-        <Message isUser={false} messageText="Heyy!" />
-        <Message isUser={true} messageText="Heyy!" />
-        <Message isUser={true} messageText="Heyy!" />
-        <Message isUser={false} messageText="Heyy!" />
-        <Message isUser={true} messageText="Hey!" />
-        <Message isUser={false} messageText="Hey!" />
-      </View>
+      <ScrollView style={styles.messages} ref={messagesRef}>
+        <MessageComponent messageText="Hey!" />
+        <MessageComponent sender="Daniel" messageText="Hey!" />
+        <MessageComponent messageText="Hey!" />
+        <MessageComponent sender="Daniel" messageText="Heyy!" />
+        <MessageComponent messageText="Heyy!" />
+        <MessageComponent messageText="Heyy!" />
+        <MessageComponent sender="Daniel" messageText="Heyy!" />
+        <MessageComponent messageText="Hey!" />
+        <MessageComponent sender="Daniel" messageText="Hey!" />
+        <MessageComponent sender="Daniel" messageText="Hey!" />
+        <MessageComponent sender="Daniel" messageText="Hey!" />
+        <MessageComponent sender="Daniel" messageText="Hey!" />
+      </ScrollView>
     </View>
   );
 };
@@ -73,7 +91,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-  }
+  },
 });
 
 export default ChatScreen;
