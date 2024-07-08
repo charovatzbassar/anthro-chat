@@ -1,24 +1,19 @@
 import { Colors } from "@/utils";
-import React, { useEffect, useRef } from "react";
-import {
-  Button,
-  Pressable,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-} from "react-native";
+import React, { useEffect, useRef, useState } from "react";
+import { StyleSheet, TextInput, View } from "react-native";
 import { Message as MessageComponent } from "./components";
 import { Formik } from "formik";
 import IconButton from "./components/IconButton/IconButton";
 import { ScrollView } from "react-native-gesture-handler";
 import { Message } from "@/utils/types";
+import { messageSchema } from "@/utils/validation";
 
 type Props = {};
 
 const ChatScreen = (props: Props) => {
   const messagesRef = useRef<ScrollView>(null);
-  const [messages, setMessages] = React.useState<Message[]>([]);
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [usersTyping, setUsersTyping] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     if (messagesRef.current) {
@@ -26,12 +21,20 @@ const ChatScreen = (props: Props) => {
     }
   }, []);
 
+  const onSubmit = async (values: { message: string }) => {
+    try {
+      const isValid = await messageSchema.validate(values);
+
+      console.log(values);
+    } catch (error) {
+      console.error(error);
+      return;
+    }
+  };
+
   return (
     <View style={styles.chatScreen}>
-      <Formik
-        initialValues={{ message: "" }}
-        onSubmit={(values) => console.log(values)}
-      >
+      <Formik initialValues={{ message: "" }} onSubmit={onSubmit}>
         {({ handleSubmit, handleBlur, handleChange, values }) => (
           <View style={styles.messageForm}>
             <TextInput
