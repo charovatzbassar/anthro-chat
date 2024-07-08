@@ -1,21 +1,35 @@
 import React from "react";
 import { ChatScreen } from "@/screens";
-import { Text, StyleSheet, TextInput, SafeAreaView, View } from "react-native";
+import { StyleSheet, SafeAreaView, View } from "react-native";
 import { Colors } from "@/utils";
+import { createStackNavigator } from "@react-navigation/stack";
+import { NavigationContainer } from "@react-navigation/native";
+import { StatusBar } from "expo-status-bar";
+
+const Stack = createStackNavigator();
 
 const App: React.FC<{}> = () => {
   return (
-    <SafeAreaView style={styles.background}>
-      <ChatScreen />
-    </SafeAreaView>
+    <View style={styles.background}>
+      <StatusBar style="light" />
+      <NavigationContainer>
+        <Stack.Navigator screenOptions={{
+          title: "AnthroChat",
+          headerStyle: {
+            backgroundColor: Colors["darkBlue"],
+          },
+          headerTintColor: Colors["yellow500"],
+        }}>
+          <Stack.Screen name="Chat" component={ChatScreen} />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   background: {
-    backgroundColor: Colors["darkBlue"],
     flex: 1,
-    padding: 12,
   },
 });
 

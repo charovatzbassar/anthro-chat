@@ -1,2 +1,1 @@
-export { default as UserMessage } from "./UserMessage";
-export { default as ReceivedMessage } from "./ReceivedMessage";
+export { default as Message } from "./Message";
