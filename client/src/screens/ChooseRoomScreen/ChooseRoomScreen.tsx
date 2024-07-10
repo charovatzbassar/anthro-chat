@@ -13,8 +13,9 @@ import {
   Button,
   TextStyle,
   Text,
+  AppState,
 } from "react-native";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { actions as roomActions } from "@/store/slices/chatSlice";
 import { AppDispatch } from "@/store";
 
@@ -29,13 +30,22 @@ type Styles = {
 const ChooseRoomScreen = (props: Props) => {
   const dispatch = useDispatch<AppDispatch>();
 
+  const chat = useSelector(selectChat);
+
+  const { socket } = props.route.params;
+
   const onSubmit = async (values: RoomFormValues) => {
     try {
       await roomSchema.validate(values);
+      socket.emit("join_room", {
+        room: values.room,
+        username: values.username,
+        oldRoom: chat.room,
+      });
 
       dispatch(roomActions.setUsername({ username: values.username }));
       dispatch(roomActions.setRoom({ room: values.room }));
-      props.navigation.navigate("Chat");
+      props.navigation.navigate("Chat", { socket });
     } catch (error) {
       return;
     }

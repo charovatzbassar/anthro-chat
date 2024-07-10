@@ -1,8 +1,10 @@
+import { Socket } from "socket.io-client";
+
 export type Message = { text: string; username: string };
 
 export type RootStackParamList = {
-  ChooseRoom: undefined;
-  Chat: undefined;
+  ChooseRoom: { socket: Socket };
+  Chat: { socket: Socket };
 };
 
 export type MessageFormValues = {

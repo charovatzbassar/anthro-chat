@@ -16,22 +16,12 @@ type Props = StackScreenProps<RootStackParamList, "Chat">;
 const ChatScreen = (props: Props) => {
   const chat = useSelector(selectChat);
 
+  const { socket } = props.route.params;
+
   const messagesRef = useRef<ScrollView>(null);
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      username: "Me",
-      text: "Hey!",
-    },
-    {
-      username: "Daniel",
-      text: "Hey!",
-    },
-    {
-      username: "Me",
-      text: "Hey!",
-    },
-  ]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [usersTyping, setUsersTyping] = useState<Set<string>>(new Set());
+  
 
   useEffect(() => {
     if (messagesRef.current) {

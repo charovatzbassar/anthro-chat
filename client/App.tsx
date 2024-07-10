@@ -14,17 +14,9 @@ import { SERVER_URL } from "@/utils/constants";
 const Stack = createStackNavigator<RootStackParamList>();
 
 const App: React.FC<{}> = () => {
-  const [socket, setSocket] = useState<Socket | null>(null);
-
-  useEffect(() => {
-    const newSocket = io(SERVER_URL, {
-      transports: ["websocket"], // Use WebSocket transport if needed
-    });
-    setSocket(newSocket);
-    return () => {
-      newSocket.close();
-    };
-  }, []);
+  const socket = io(SERVER_URL, {
+    transports: ["websocket"],
+  });
 
   return (
     <View style={styles.background}>
@@ -40,8 +32,16 @@ const App: React.FC<{}> = () => {
               headerTintColor: Colors["yellow500"],
             }}
           >
-            <Stack.Screen name="ChooseRoom" component={ChooseRoomScreen} />
-            <Stack.Screen name="Chat" component={ChatScreen} />
+            <Stack.Screen
+              name="ChooseRoom"
+              component={ChooseRoomScreen}
+              initialParams={{ socket }}
+            />
+            <Stack.Screen
+              name="Chat"
+              component={ChatScreen}
+              initialParams={{ socket }}
+            />
           </Stack.Navigator>
         </NavigationContainer>
       </Provider>

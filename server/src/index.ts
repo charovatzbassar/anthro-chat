@@ -27,18 +27,18 @@ io.on("connection", (socket) => {
     if (users[socket.id]) {
       socket.leave(users[socket.id]);
       io.to(users[socket.id]).emit("receive_message", {
-        message: `${data.username} left the room!`,
+        text: `${data.username} left the room!`,
         username: "Server",
       });
     }
-
+    console.log(data);
     // Join the new room
     socket.join(data.room);
     users[socket.id] = data.room;
 
     // Inform other users in the room about the new user
     socket.to(data.room).emit("receive_message", {
-      message: `${data.username} joined the room!`,
+      text: `${data.username} joined the room!`,
       username: "Server",
     });
 
@@ -56,7 +56,7 @@ io.on("connection", (socket) => {
       if (users[socket.id]) {
         socket.leave(users[socket.id]);
         io.to(users[socket.id]).emit("receive_message", {
-          message: `${data.username} left the room!`,
+          text: `${data.username} left the room!`,
           username: "Server",
         });
         delete users[socket.id];
