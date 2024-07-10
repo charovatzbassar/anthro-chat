@@ -1,6 +1,6 @@
 import { selectChat } from "@/store/slices/chatSlice";
 import { Colors } from "@/utils";
-import { RootStackParamList } from "@/utils/types";
+import { RoomFormValues, RootStackParamList } from "@/utils/types";
 import { roomSchema } from "@/utils/validation";
 import { StackScreenProps } from "@react-navigation/stack";
 import { Formik } from "formik";
@@ -29,7 +29,7 @@ type Styles = {
 const ChooseRoomScreen = (props: Props) => {
   const dispatch = useDispatch<AppDispatch>();
 
-  const onSubmit = async (values: { username: string; room: string }) => {
+  const onSubmit = async (values: RoomFormValues) => {
     try {
       await roomSchema.validate(values);
 

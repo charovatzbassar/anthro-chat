@@ -1,4 +1,4 @@
-import express, { Express, Request, Response } from "express";
+import express, { Express } from "express";
 import http, { Server as HttpServer } from "http";
 import { Server as SocketIOServer } from "socket.io";
 import cors from "cors";
@@ -11,7 +11,7 @@ const server: HttpServer = http.createServer(app);
 
 const io: SocketIOServer = new SocketIOServer(server, {
   cors: {
-    origin: "http://localhost:3000",
+    origin: "*",
     methods: ["GET", "POST"],
   },
 });

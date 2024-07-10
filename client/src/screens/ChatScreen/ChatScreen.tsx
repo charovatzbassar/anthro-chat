@@ -5,14 +5,32 @@ import { Message as MessageComponent } from "./components";
 import { Formik } from "formik";
 import IconButton from "./components/IconButton/IconButton";
 import { ScrollView } from "react-native-gesture-handler";
-import { Message } from "@/utils/types";
+import { Message, MessageFormValues, RootStackParamList } from "@/utils/types";
 import { messageSchema } from "@/utils/validation";
+import { useSelector } from "react-redux";
+import { selectChat } from "@/store/slices/chatSlice";
+import { StackScreenProps } from "@react-navigation/stack";
 
-type Props = {};
+type Props = StackScreenProps<RootStackParamList, "Chat">;
 
 const ChatScreen = (props: Props) => {
+  const chat = useSelector(selectChat);
+
   const messagesRef = useRef<ScrollView>(null);
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [messages, setMessages] = useState<Message[]>([
+    {
+      username: "Me",
+      text: "Hey!",
+    },
+    {
+      username: "Daniel",
+      text: "Hey!",
+    },
+    {
+      username: "Me",
+      text: "Hey!",
+    },
+  ]);
   const [usersTyping, setUsersTyping] = useState<Set<string>>(new Set());
 
   useEffect(() => {
@@ -21,13 +39,12 @@ const ChatScreen = (props: Props) => {
     }
   }, []);
 
-  const onSubmit = async (values: { message: string }) => {
+  const onSubmit = async (values: MessageFormValues) => {
     try {
       const isValid = await messageSchema.validate(values);
 
       console.log(values);
     } catch (error) {
-      console.error(error);
       return;
     }
   };
@@ -54,18 +71,13 @@ const ChatScreen = (props: Props) => {
         )}
       </Formik>
       <ScrollView style={styles.messages} ref={messagesRef}>
-        <MessageComponent messageText="Hey!" />
-        <MessageComponent sender="Daniel" messageText="Hey!" />
-        <MessageComponent messageText="Hey!" />
-        <MessageComponent sender="Daniel" messageText="Heyy!" />
-        <MessageComponent messageText="Heyy!" />
-        <MessageComponent messageText="Heyy!" />
-        <MessageComponent sender="Daniel" messageText="Heyy!" />
-        <MessageComponent messageText="Hey!" />
-        <MessageComponent sender="Daniel" messageText="Hey!" />
-        <MessageComponent sender="Daniel" messageText="Hey!" />
-        <MessageComponent sender="Daniel" messageText="Hey!" />
-        <MessageComponent sender="Daniel" messageText="Hey!" />
+        {messages.map((msg, idx) => (
+          <MessageComponent
+            key={idx}
+            messageText={msg.text}
+            sender={msg.username !== chat.username ? msg.username : undefined}
+          />
+        ))}
       </ScrollView>
     </View>
   );
