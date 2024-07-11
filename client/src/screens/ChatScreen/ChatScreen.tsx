@@ -20,37 +20,48 @@ const ChatScreen = (props: Props) => {
 
   const messagesRef = useRef<ScrollView>(null);
   const [messages, setMessages] = useState<Message[]>([]);
-  const [usersTyping, setUsersTyping] = useState<Set<string>>(new Set());
-  
+  // const [usersTyping, setUsersTyping] = useState<Set<string>>(new Set());
 
   useEffect(() => {
+    socket.on("receive_message", (data) => {
+      setMessages((currMessages) => [
+        ...currMessages,
+        { text: data.text, username: data.username },
+      ]);
+    });
+
     if (messagesRef.current) {
       messagesRef.current.scrollToEnd({ animated: false });
     }
-  }, []);
+  }, [socket]);
 
   const onSubmit = async (values: MessageFormValues) => {
-    try {
-      const isValid = await messageSchema.validate(values);
+    if (values.text === "") return;
 
-      console.log(values);
-    } catch (error) {
-      return;
-    }
+    socket.emit("send_message", {
+      text: values.text,
+      room: chat.room,
+      username: chat.username,
+    });
+    setMessages((currMessages) => [
+      ...currMessages,
+      { username: chat.username, text: values.text },
+    ]);
+    values.text = "";
   };
 
   return (
     <View style={styles.chatScreen}>
-      <Formik initialValues={{ message: "" }} onSubmit={onSubmit}>
+      <Formik initialValues={{ text: "" }} onSubmit={onSubmit}>
         {({ handleSubmit, handleBlur, handleChange, values }) => (
           <View style={styles.messageForm}>
             <TextInput
               style={styles.input}
-              onChangeText={handleChange("message")}
-              onBlur={handleBlur("message")}
+              onChangeText={handleChange("text")}
+              onBlur={handleBlur("text")}
               placeholder="Type a message..."
               placeholderTextColor={Colors["yellow500"]}
-              value={values.message}
+              value={values.text}
             />
             <IconButton
               onPress={handleSubmit}

@@ -31,7 +31,6 @@ io.on("connection", (socket) => {
         username: "Server",
       });
     }
-    console.log(data);
     // Join the new room
     socket.join(data.room);
     users[socket.id] = data.room;
@@ -67,7 +66,7 @@ io.on("connection", (socket) => {
   socket.on("send_message", (data) => {
     socket.to(data.room).emit("receive_message", data);
   });
-}); // This is the event listener for when a new client connects to the server
+}); 
 
 server.listen(port, () => {
   console.log("Server is running on port " + port);

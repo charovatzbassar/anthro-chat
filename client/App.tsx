@@ -8,7 +8,7 @@ import { StatusBar } from "expo-status-bar";
 import { Provider } from "react-redux";
 import store from "@/store";
 import { RootStackParamList } from "@/utils/types";
-import io, { Socket } from "socket.io-client";
+import io from "socket.io-client";
 import { SERVER_URL } from "@/utils/constants";
 
 const Stack = createStackNavigator<RootStackParamList>();

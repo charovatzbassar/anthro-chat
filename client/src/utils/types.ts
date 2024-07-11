@@ -8,7 +8,7 @@ export type RootStackParamList = {
 };
 
 export type MessageFormValues = {
-  message: string;
+  text: string;
 };
 
 export type RoomFormValues = {

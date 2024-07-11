@@ -35,20 +35,17 @@ const ChooseRoomScreen = (props: Props) => {
   const { socket } = props.route.params;
 
   const onSubmit = async (values: RoomFormValues) => {
-    try {
-      await roomSchema.validate(values);
-      socket.emit("join_room", {
-        room: values.room,
-        username: values.username,
-        oldRoom: chat.room,
-      });
+    if (values.username === "" || values.room === "") return;
 
-      dispatch(roomActions.setUsername({ username: values.username }));
-      dispatch(roomActions.setRoom({ room: values.room }));
-      props.navigation.navigate("Chat", { socket });
-    } catch (error) {
-      return;
-    }
+    socket.emit("join_room", {
+      room: values.room,
+      username: values.username,
+      oldRoom: chat.room,
+    });
+
+    dispatch(roomActions.setUsername({ username: values.username }));
+    dispatch(roomActions.setRoom({ room: values.room }));
+    props.navigation.navigate("Chat", { socket });
   };
   return (
     <View style={styles.container}>
