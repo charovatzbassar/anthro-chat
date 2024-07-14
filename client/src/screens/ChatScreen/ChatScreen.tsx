@@ -6,7 +6,6 @@ import { Formik } from "formik";
 import IconButton from "./components/IconButton/IconButton";
 import { ScrollView } from "react-native-gesture-handler";
 import { Message, MessageFormValues, RootStackParamList } from "@/utils/types";
-import { messageSchema } from "@/utils/validation";
 import { useSelector } from "react-redux";
 import { selectChat } from "@/store/slices/chatSlice";
 import { StackScreenProps } from "@react-navigation/stack";
@@ -21,6 +20,8 @@ const ChatScreen = (props: Props) => {
   const messagesRef = useRef<ScrollView>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   // const [usersTyping, setUsersTyping] = useState<Set<string>>(new Set());
+
+  props.navigation.setOptions({ title: chat.room });
 
   useEffect(() => {
     socket.on("receive_message", (data) => {

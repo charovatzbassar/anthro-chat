@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { ChatScreen, ChooseRoomScreen } from "@/screens";
 import { StyleSheet, View } from "react-native";
 import { Colors } from "@/utils";
@@ -9,27 +9,12 @@ import { Provider } from "react-redux";
 import store from "@/store";
 import { RootStackParamList } from "@/utils/types";
 import io from "socket.io-client";
-import { getServerUrl, SERVER_URL } from "@/utils/constants";
-import * as Network from "expo-network";
+import { SERVER_URL } from "@/utils/constants";
 
 const Stack = createStackNavigator<RootStackParamList>();
 
 const App: React.FC<{}> = () => {
-  const [ipAddress, setIpAddress] = useState<string>("");
-
-  useEffect(() => {
-    const fetchIpAddress = async () => {
-      try {
-        const ip = await Network.getIpAddressAsync();
-        setIpAddress(ip);
-      } catch (error) {
-        console.error("Error fetching IP address:", error);
-      }
-    };
-
-    fetchIpAddress();
-  }, []);
-  const socket = io(getServerUrl(ipAddress), {
+  const socket = io(SERVER_URL, {
     transports: ["websocket"],
   });
 

@@ -66,7 +66,7 @@ io.on("connection", (socket) => {
   socket.on("send_message", (data) => {
     socket.to(data.room).emit("receive_message", data);
   });
-}); 
+});
 
 server.listen(port, () => {
   console.log("Server is running on port " + port);
