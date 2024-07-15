@@ -9,6 +9,7 @@ import { Message, MessageFormValues, RootStackParamList } from "@/utils/types";
 import { useSelector } from "react-redux";
 import { selectChat } from "@/store/slices/chatSlice";
 import { StackScreenProps } from "@react-navigation/stack";
+import { USER_TYPING_TIMEOUT_LENGTH } from "@/utils/constants";
 
 type Props = StackScreenProps<RootStackParamList, "Chat">;
 
@@ -19,7 +20,9 @@ const ChatScreen = (props: Props) => {
 
   const messagesRef = useRef<ScrollView>(null);
   const [messages, setMessages] = useState<Message[]>([]);
-  // const [usersTyping, setUsersTyping] = useState<Set<string>>(new Set());
+  const [usersTyping, setUsersTyping] = useState<Set<string>>(new Set());
+  let userTypingTimeout: NodeJS.Timeout | undefined = undefined;
+  let someoneTypingTimeout: NodeJS.Timeout | undefined = undefined;
 
   props.navigation.setOptions({ title: chat.room });
 
@@ -31,10 +34,53 @@ const ChatScreen = (props: Props) => {
       ]);
     });
 
+    socket.on("someone_is_typing", (data) => {
+      // Add username to the set
+      setUsersTyping((prevUsers) => {
+        const newUsers = new Set(prevUsers);
+        newUsers.add(data.username);
+        return newUsers;
+      });
+
+      console.log(data);
+
+      // Clear the previous timeout if it exists
+      if (someoneTypingTimeout) {
+        clearTimeout(someoneTypingTimeout);
+      }
+
+      // Set a new timeout to remove the username after 5 seconds
+      someoneTypingTimeout = setTimeout(() => {
+        setUsersTyping((prevUsers) => {
+          const newUsers = new Set(prevUsers);
+          newUsers.delete(data.username);
+          return newUsers;
+        });
+      }, USER_TYPING_TIMEOUT_LENGTH);
+    });
+
     if (messagesRef.current) {
       messagesRef.current.scrollToEnd({ animated: false });
     }
   }, [socket]);
+
+  const handleTyping = () => {
+    clearTimeout(userTypingTimeout);
+
+    socket.emit("user_typing", {
+      username: chat.username,
+      room: chat.room,
+      userIsTyping: true,
+    });
+
+    userTypingTimeout = setTimeout(() => {
+      socket.emit("user_typing", {
+        username: chat.username,
+        room: chat.room,
+        userIsTyping: false,
+      });
+    }, USER_TYPING_TIMEOUT_LENGTH);
+  };
 
   const onSubmit = async (values: MessageFormValues) => {
     if (values.text === "") return;
@@ -58,7 +104,10 @@ const ChatScreen = (props: Props) => {
           <View style={styles.messageForm}>
             <TextInput
               style={styles.input}
-              onChangeText={handleChange("text")}
+              onChangeText={(text) => {
+                handleChange("text")(text);
+                handleTyping();
+              }}
               onBlur={handleBlur("text")}
               placeholder="Type a message..."
               placeholderTextColor={Colors["yellow500"]}
