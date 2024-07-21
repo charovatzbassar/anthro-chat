@@ -1,7 +1,8 @@
+import { MessageDto } from "@/dto";
 import mongoose from "mongoose";
 const { model, Schema } = mongoose;
 
-const messageSchema = new Schema({
+const messageSchema = new Schema<MessageDto>({
   text: {
     type: String,
     unique: true,
@@ -16,7 +17,7 @@ const messageSchema = new Schema({
     type: Schema.Types.ObjectId,
     ref: "User",
     required: true,
-  }
+  },
 });
 
-export default model("Message", messageSchema);
+export default model<MessageDto>("Message", messageSchema);

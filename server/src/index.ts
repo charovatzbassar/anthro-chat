@@ -3,8 +3,12 @@ import http, { Server as HttpServer } from "http";
 import { Server as SocketIOServer } from "socket.io";
 import cors from "cors";
 import mongoose from "mongoose";
-import { ExpressError } from "./utils/ExpressError.class";
+import { ExpressError } from "@/utils";
+import { messageRoutes } from "@/routes";
 import mongoSanitize from "express-mongo-sanitize";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 const app: Express = express();
 
@@ -83,6 +87,8 @@ io.on("connection", (socket) => {
     socket.to(data.room).emit("receive_message", data);
   });
 });
+
+app.use("/api/messages", messageRoutes);
 
 app.all("*", (req: Request, res: Response, next: NextFunction) => {
   next(new ExpressError("Page not found", 404));

@@ -1,4 +1,4 @@
-export class ExpressError extends Error {
+class ExpressError extends Error {
   public errorMsg: string;
   public status: number;
 
@@ -8,3 +8,5 @@ export class ExpressError extends Error {
     this.status = status;
   }
 }
+
+export default ExpressError;
