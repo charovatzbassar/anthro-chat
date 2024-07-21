@@ -1,6 +1,6 @@
 import { Colors } from "@/utils";
 import React, { useEffect, useRef, useState } from "react";
-import { StyleSheet, TextInput, View } from "react-native";
+import { StyleSheet, Text, TextInput, View } from "react-native";
 import { Message as MessageComponent } from "./components";
 import { Formik } from "formik";
 import IconButton from "./components/IconButton/IconButton";
@@ -14,17 +14,17 @@ import { USER_TYPING_TIMEOUT_LENGTH } from "@/utils/constants";
 type Props = StackScreenProps<RootStackParamList, "Chat">;
 
 const ChatScreen = (props: Props) => {
-  const chat = useSelector(selectChat);
+  const { room, username } = useSelector(selectChat);
 
   const { socket } = props.route.params;
 
   const messagesRef = useRef<ScrollView>(null);
   const [messages, setMessages] = useState<Message[]>([]);
-  const [usersTyping, setUsersTyping] = useState<Set<string>>(new Set());
-  let userTypingTimeout: NodeJS.Timeout | undefined = undefined;
-  let someoneTypingTimeout: NodeJS.Timeout | undefined = undefined;
+  const [isTyping, setIsTyping] = useState<boolean>(false);
 
-  props.navigation.setOptions({ title: chat.room });
+  let typingTimeout: NodeJS.Timeout | null = null;
+
+  props.navigation.setOptions({ title: room });
 
   useEffect(() => {
     socket.on("receive_message", (data) => {
@@ -35,27 +35,12 @@ const ChatScreen = (props: Props) => {
     });
 
     socket.on("someone_is_typing", (data) => {
-      // Add username to the set
-      setUsersTyping((prevUsers) => {
-        const newUsers = new Set(prevUsers);
-        newUsers.add(data.username);
-        return newUsers;
-      });
-
-      console.log(data);
-
-      // Clear the previous timeout if it exists
-      if (someoneTypingTimeout) {
-        clearTimeout(someoneTypingTimeout);
+      if (typingTimeout) {
+        clearTimeout(typingTimeout);
       }
-
-      // Set a new timeout to remove the username after 5 seconds
-      someoneTypingTimeout = setTimeout(() => {
-        setUsersTyping((prevUsers) => {
-          const newUsers = new Set(prevUsers);
-          newUsers.delete(data.username);
-          return newUsers;
-        });
+      setIsTyping(true);
+      typingTimeout = setTimeout(() => {
+        setIsTyping(false);
       }, USER_TYPING_TIMEOUT_LENGTH);
     });
 
@@ -64,35 +49,17 @@ const ChatScreen = (props: Props) => {
     }
   }, [socket]);
 
-  const handleTyping = () => {
-    clearTimeout(userTypingTimeout);
-
-    socket.emit("user_typing", {
-      username: chat.username,
-      room: chat.room,
-      userIsTyping: true,
-    });
-
-    userTypingTimeout = setTimeout(() => {
-      socket.emit("user_typing", {
-        username: chat.username,
-        room: chat.room,
-        userIsTyping: false,
-      });
-    }, USER_TYPING_TIMEOUT_LENGTH);
-  };
-
   const onSubmit = async (values: MessageFormValues) => {
     if (values.text === "") return;
 
     socket.emit("send_message", {
       text: values.text,
-      room: chat.room,
-      username: chat.username,
+      room,
+      username,
     });
     setMessages((currMessages) => [
       ...currMessages,
-      { username: chat.username, text: values.text },
+      { username, text: values.text },
     ]);
     values.text = "";
   };
@@ -106,7 +73,12 @@ const ChatScreen = (props: Props) => {
               style={styles.input}
               onChangeText={(text) => {
                 handleChange("text")(text);
-                handleTyping();
+
+                socket.emit("user_typing", {
+                  username,
+                  room,
+                  userIsTyping: true,
+                });
               }}
               onBlur={handleBlur("text")}
               placeholder="Type a message..."
@@ -121,12 +93,15 @@ const ChatScreen = (props: Props) => {
           </View>
         )}
       </Formik>
+      {isTyping && (
+        <Text style={{ color: Colors["yellow500"] }}>Someone is typing...</Text>
+      )}
       <ScrollView style={styles.messages} ref={messagesRef}>
         {messages.map((msg, idx) => (
           <MessageComponent
             key={idx}
             messageText={msg.text}
-            sender={msg.username !== chat.username ? msg.username : undefined}
+            sender={msg.username !== username ? msg.username : undefined}
           />
         ))}
       </ScrollView>
