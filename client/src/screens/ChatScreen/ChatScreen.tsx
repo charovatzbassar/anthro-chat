@@ -1,6 +1,13 @@
 import { Colors } from "@/utils";
 import React, { useEffect, useRef, useState } from "react";
-import { StyleSheet, Text, TextInput, View } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  TextInput,
+  TextStyle,
+  View,
+  ViewStyle,
+} from "react-native";
 import { Message as MessageComponent } from "./components";
 import { Formik } from "formik";
 import IconButton from "./components/IconButton/IconButton";
@@ -13,6 +20,14 @@ import { USER_TYPING_TIMEOUT_LENGTH } from "@/utils/constants";
 
 type Props = StackScreenProps<RootStackParamList, "Chat">;
 
+type Styles = {
+  chatScreen: ViewStyle;
+  messages: ViewStyle;
+  input: TextStyle;
+  messageForm: ViewStyle;
+  typingText: TextStyle;
+};
+
 const ChatScreen = (props: Props) => {
   const { room, username } = useSelector(selectChat);
 
@@ -20,7 +35,9 @@ const ChatScreen = (props: Props) => {
 
   const messagesRef = useRef<ScrollView>(null);
   const [messages, setMessages] = useState<Message[]>([]);
-  const [isTyping, setIsTyping] = useState<boolean>(false);
+  const [typingUsers, setTypingUsers] = useState<Set<string>>(
+    new Set<string>()
+  );
 
   let typingTimeout: NodeJS.Timeout | null = null;
 
@@ -38,9 +55,15 @@ const ChatScreen = (props: Props) => {
       if (typingTimeout) {
         clearTimeout(typingTimeout);
       }
-      setIsTyping(true);
+      setTypingUsers((currTypingUsers) => {
+        currTypingUsers.add(data.username);
+        return new Set(currTypingUsers);
+      });
       typingTimeout = setTimeout(() => {
-        setIsTyping(false);
+        setTypingUsers((currTypingUsers) => {
+          currTypingUsers.delete(data.username);
+          return new Set(currTypingUsers);
+        });
       }, USER_TYPING_TIMEOUT_LENGTH);
     });
 
@@ -93,8 +116,10 @@ const ChatScreen = (props: Props) => {
           </View>
         )}
       </Formik>
-      {isTyping && (
-        <Text style={{ color: Colors["yellow500"] }}>Someone is typing...</Text>
+      {typingUsers.size > 0 && (
+        <Text style={styles.typingText}>
+          {Array.from(typingUsers).join(", ")} is typing...
+        </Text>
       )}
       <ScrollView style={styles.messages} ref={messagesRef}>
         {messages.map((msg, idx) => (
@@ -109,7 +134,7 @@ const ChatScreen = (props: Props) => {
   );
 };
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create<Styles>({
   chatScreen: {
     flex: 1,
     flexDirection: "column-reverse",
@@ -133,6 +158,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
   },
+  typingText: { color: Colors["yellow500"] },
 });
 
 export default ChatScreen;
