@@ -8,8 +8,7 @@ import mongoSanitize from "express-mongo-sanitize";
 
 const app: Express = express();
 
-const socketPort: number = 8080;
-const restPort: number = 3000;
+const port: number = 8080;
 
 mongoose
   .connect(process.env.DB_URL || "mongodb://localhost:27017/anthrochat")
@@ -85,7 +84,7 @@ io.on("connection", (socket) => {
   });
 });
 
-app.all("*", (req, res, next) => {
+app.all("*", (req: Request, res: Response, next: NextFunction) => {
   next(new ExpressError("Page not found", 404));
 });
 
@@ -97,10 +96,6 @@ app.use(
   }
 );
 
-app.listen(restPort, () => {
-  console.log("REST server is running on port " + restPort);
-});
-
-server.listen(socketPort, () => {
-  console.log("Socket server is running on port " + socketPort);
+server.listen(port, () => {
+  console.log("Server is running on port " + port);
 });
