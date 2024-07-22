@@ -1,10 +1,17 @@
 import { Types } from "mongoose";
 
-interface MessageDto {
-  _id: Types.ObjectId;
-  text: string;
-  room: string;
-  user: Types.ObjectId;
+class MessageDto {
+  public _id?: Types.ObjectId;
+  public text: string;
+  public room: string;
+  public user: Types.ObjectId;
+
+  constructor(data: MessageDto) {
+    this._id = data._id;
+    this.text = data.text;
+    this.room = data.room;
+    this.user = data.user;
+  }
 }
 
 export default MessageDto;

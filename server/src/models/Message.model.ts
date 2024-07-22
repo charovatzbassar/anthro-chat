@@ -1,16 +1,13 @@
 import { MessageDto } from "@/dto";
-import mongoose from "mongoose";
-const { model, Schema } = mongoose;
+import { model, Schema } from "mongoose";
 
 const messageSchema = new Schema<MessageDto>({
   text: {
     type: String,
-    unique: true,
     required: true,
   },
   room: {
     type: String,
-    unique: true,
     required: true,
   },
   user: {
