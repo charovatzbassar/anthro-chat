@@ -1,7 +1,8 @@
+import { UserDto } from "@/dto";
 import mongoose from "mongoose";
 const { model, Schema } = mongoose;
 
-const userSchema = new Schema({
+const userSchema = new Schema<UserDto>({
   username: {
     type: String,
     unique: true,
@@ -19,4 +20,4 @@ const userSchema = new Schema({
   },
 });
 
-export default model("User", userSchema);
+export default model<UserDto>("User", userSchema);

@@ -4,7 +4,7 @@ import { Server as SocketIOServer } from "socket.io";
 import cors from "cors";
 import mongoose from "mongoose";
 import { ExpressError } from "@/utils";
-import { messageRoutes } from "@/routes";
+import { messageRoutes, userRoutes } from "@/routes";
 import mongoSanitize from "express-mongo-sanitize";
 import dotenv from "dotenv";
 
@@ -91,6 +91,7 @@ io.on("connection", (socket) => {
 });
 
 app.use("/api/messages", messageRoutes);
+app.use("/api/users", userRoutes);
 
 app.all("*", (req: Request, res: Response, next: NextFunction) => {
   next(new ExpressError("Page not found", 404));
