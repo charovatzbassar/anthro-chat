@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { ChatScreen, ChooseRoomScreen } from "@/screens";
 import { StyleSheet, View } from "react-native";
 import { Colors, queryClient } from "@/utils";

@@ -1,64 +1,14 @@
 import { MessageDto } from "@/dto";
-import { appAxios } from "@/utils";
 import { BaseService } from "./BaseService";
+import { RestClient } from "@/utils";
 
-class MessageService implements BaseService<MessageDto> {
-  findAll = async (): Promise<MessageDto[]> =>
-    appAxios
-      .get("/messages")
-      .then((response) => response.data)
-      .catch((error) => {
-        console.error(error);
-        return error;
-      });
+class MessageService extends BaseService<MessageDto> {
+  constructor() {
+    super("/messages");
+  }
 
-  create = async (message: MessageDto): Promise<MessageDto> =>
-    appAxios
-      .post("/messages", message)
-      .then((response) => response.data)
-      .catch((error) => {
-        console.error(error);
-        return error;
-      });
-
-  update = async (
-    id: string,
-    message: MessageDto
-  ): Promise<MessageDto | null> =>
-    appAxios
-      .put(`/messages/${id}`, message)
-      .then((response) => response.data)
-      .catch((error) => {
-        console.error(error);
-        return error;
-      });
-
-  delete = async (id: string): Promise<MessageDto | null> =>
-    appAxios
-      .delete(`/messages/${id}`)
-      .then((response) => response.data)
-      .catch((error) => {
-        console.error(error);
-        return error;
-      });
-
-  findById = async (id: string): Promise<MessageDto | null> =>
-    appAxios
-      .get(`/messages/${id}`)
-      .then((response) => response.data)
-      .catch((error) => {
-        console.error(error);
-        return error;
-      });
-
-  findByRoom = async (room: string): Promise<MessageDto[]> =>
-    appAxios
-      .get(`/messages/?room=${room}`)
-      .then((response) => response.data)
-      .catch((error) => {
-        console.error(error);
-        return error;
-      });
+  findByRoom = (room: string): Promise<MessageDto[]> =>
+    RestClient.get(`${super.Endpoint}?room=${room}`);
 }
 
 export default MessageService;

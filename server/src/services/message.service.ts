@@ -1,4 +1,4 @@
-import { MessageModel } from "@/models";
+import { MessageModel, RoomModel } from "@/models";
 import { MessageDto } from "@/dto";
 import { BaseService } from "./BaseService";
 
@@ -25,8 +25,17 @@ class MessageService implements BaseService<MessageDto> {
   public getById = async (id: string): Promise<MessageDto | null> =>
     await MessageModel.findById(id).populate("user").populate("room");
 
-  public getByRoom = async (room: string): Promise<MessageDto[]> =>
-    await MessageModel.find({ room }).populate("user").populate("room");
+  public getByRoom = async (roomName: string): Promise<MessageDto[]> => {
+    const room = await RoomModel.findOne({ name: roomName });
+
+    if (!room) {
+      throw new Error("Room not found");
+    }
+
+    return await MessageModel.find({ room: room._id })
+      .populate("user")
+      .populate("room");
+  };
 }
 
 export default MessageService;

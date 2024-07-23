@@ -17,8 +17,7 @@ import { useSelector } from "react-redux";
 import { selectChat } from "@/store/slices/chatSlice";
 import { StackScreenProps } from "@react-navigation/stack";
 import { USER_TYPING_TIMEOUT_LENGTH } from "@/utils/constants";
-import { MessageService } from "@/services";
-import { useMessages, useMessagesByRoom } from "@/hooks";
+import { useMessagesByRoom } from "@/hooks";
 
 type Props = StackScreenProps<RootStackParamList, "Chat">;
 
