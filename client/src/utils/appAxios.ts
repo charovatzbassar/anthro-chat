@@ -1,8 +1,8 @@
 import axios from "axios";
-import { BASE_API_URL } from "./constants";
+import { SERVER_URL } from "./constants";
 
 const appAxios = axios.create({
-  baseURL: BASE_API_URL,
+  baseURL: `${SERVER_URL}/api`,
   timeout: 10000,
 });
 
