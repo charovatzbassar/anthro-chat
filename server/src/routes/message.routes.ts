@@ -11,8 +11,15 @@ router
   .route("/")
   .get(
     catchAsync(async (req: Request, res: Response) => {
+      const { room } = req.query;
+
+      if (room) {
+        const messages = await messageService.getByRoom(room as string);
+        return res.json(messages);
+      }
+
       const messages = await messageService.getAll();
-      res.json(messages);
+      return res.json(messages);
     })
   )
   .post(

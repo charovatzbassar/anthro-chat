@@ -7,7 +7,8 @@ const messageSchema = new Schema<MessageDto>({
     required: true,
   },
   room: {
-    type: String,
+    type: Schema.Types.ObjectId,
+    ref: "Room",
     required: true,
   },
   user: {

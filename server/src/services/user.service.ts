@@ -3,32 +3,21 @@ import { UserDto } from "@/dto";
 import { BaseService } from "./BaseService";
 
 class UserService implements BaseService<UserDto> {
-  public async create(data: UserDto): Promise<UserDto> {
-    const user = await UserModel.create(data);
-    return user;
-  }
+  public create = async (data: UserDto): Promise<UserDto> =>
+    await UserModel.create(data);
 
-  public async delete(id: string): Promise<UserDto | null> {
-    const user = await UserModel.findByIdAndDelete(id);
-    return user;
-  }
+  public delete = async (id: string): Promise<UserDto | null> =>
+    await UserModel.findByIdAndDelete(id);
 
-  public async update(id: string, data: UserDto): Promise<UserDto | null> {
-    const user = await UserModel.findByIdAndUpdate(id, data, {
+  public update = async (id: string, data: UserDto): Promise<UserDto | null> =>
+    await UserModel.findByIdAndUpdate(id, data, {
       new: true,
     });
-    return user;
-  }
 
-  public async getAll(): Promise<UserDto[]> {
-    const users = await UserModel.find();
-    return users;
-  }
+  public getAll = async (): Promise<UserDto[]> => await UserModel.find();
 
-  public async getById(id: string): Promise<UserDto | null> {
-    const user = await UserModel.findById(id);
-    return user;
-  }
+  public getById = async (id: string): Promise<UserDto | null> =>
+    await UserModel.findById(id);
 }
 
 export default UserService;
