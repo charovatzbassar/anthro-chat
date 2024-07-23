@@ -17,6 +17,7 @@ import { useSelector } from "react-redux";
 import { selectChat } from "@/store/slices/chatSlice";
 import { StackScreenProps } from "@react-navigation/stack";
 import { USER_TYPING_TIMEOUT_LENGTH } from "@/utils/constants";
+import { MessageService } from "@/services";
 
 type Props = StackScreenProps<RootStackParamList, "Chat">;
 
@@ -42,6 +43,14 @@ const ChatScreen = (props: Props) => {
   let typingTimeout: NodeJS.Timeout | null = null;
 
   props.navigation.setOptions({ title: room });
+
+  const messageService = new MessageService();
+
+  useEffect(() => {
+    messageService.findAll().then((data) => {
+      console.log(data);
+    });
+  }, []);
 
   useEffect(() => {
     socket.on("receive_message", (data) => {
