@@ -20,7 +20,7 @@ const App: React.FC<{}> = () => {
     transports: ["websocket"],
   });
 
-  const messageService = new MessageService();
+  const messageService: MessageService = new MessageService();
 
   return (
     <View style={styles.background}>

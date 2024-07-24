@@ -8,7 +8,7 @@ class MessageService extends BaseService<MessageDto> {
   }
 
   findByRoom = (room: string): Promise<MessageDto[]> =>
-    RestClient.get(`${super.Endpoint}?room=${room}`);
+    RestClient.get(`${super.endpoint}?room=${room}`);
 }
 
 export default MessageService;

@@ -1,26 +1,26 @@
 import { RestClient } from "@/utils";
 
 export class BaseService<T> {
-  private endpoint: string;
+  private _endpoint: string;
 
   constructor(endpoint: string) {
-    this.endpoint = endpoint;
+    this._endpoint = endpoint;
   }
 
-  create = (data: T): Promise<T> => RestClient.post(this.endpoint, data);
+  create = (data: T): Promise<T> => RestClient.post(this._endpoint, data);
 
   update = (id: string, data: T): Promise<T | null> =>
-    RestClient.put(`${this.endpoint}/${id}`, data);
+    RestClient.put(`${this._endpoint}/${id}`, data);
 
   delete = (id: string): Promise<T | null> =>
-    RestClient.delete(`${this.endpoint}/${id}`);
+    RestClient.delete(`${this._endpoint}/${id}`);
 
   findById = (id: string): Promise<T | null> =>
-    RestClient.get(`${this.endpoint}/${id}`);
+    RestClient.get(`${this._endpoint}/${id}`);
 
-  findAll = (): Promise<T[]> => RestClient.get(this.endpoint);
+  findAll = (): Promise<T[]> => RestClient.get(this._endpoint);
 
-  get Endpoint(): string {
-    return this.endpoint;
+  get endpoint(): string {
+    return this._endpoint;
   }
 }

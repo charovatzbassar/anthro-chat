@@ -1,6 +1,5 @@
 import { Message } from "@/utils/types";
-import RoomDto from "./RoomDto.dto";
-import UserDto from "./UserDto.dto";
+import { RoomDto, UserDto } from "@/dto";
 
 class MessageDto {
   public _id?: string;
@@ -11,11 +10,18 @@ class MessageDto {
   constructor(data: MessageDto) {
     this._id = data._id;
     this.text = data.text;
-    this.room = data.room;
-    this.user = data.user;
+
+    this.room =
+      typeof data.room === "string" ? data.room : new RoomDto(data.room);
+
+    if (data.user && typeof data.user === "object" && "username" in data.user) {
+      this.user = new UserDto(data.user);
+    } else {
+      this.user = data.user;
+    }
   }
 
-  public toMessage(): Message {
+  public toMessageState(): Message {
     return {
       username: this.user instanceof UserDto ? this.user.username : this.user,
       text: this.text,

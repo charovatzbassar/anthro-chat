@@ -18,6 +18,7 @@ import { selectChat } from "@/store/slices/chatSlice";
 import { StackScreenProps } from "@react-navigation/stack";
 import { USER_TYPING_TIMEOUT_LENGTH } from "@/utils/constants";
 import { useMessagesByRoom } from "@/hooks";
+import { MessageDto } from "@/dto";
 
 type Props = StackScreenProps<RootStackParamList, "Chat">;
 
@@ -47,6 +48,15 @@ const ChatScreen = (props: Props) => {
   props.navigation.setOptions({ title: room });
 
   useEffect(() => {
+    if (fetchedMessages) {
+      setMessages(
+        fetchedMessages.map((msg) => {
+          const messageDto = new MessageDto(msg);
+          return messageDto.toMessageState();
+        })
+      );
+    }
+
     socket.on("receive_message", (data) => {
       setMessages((currMessages) => [
         ...currMessages,
@@ -73,7 +83,7 @@ const ChatScreen = (props: Props) => {
     if (messagesRef.current) {
       messagesRef.current.scrollToEnd({ animated: false });
     }
-  }, [socket]);
+  }, [socket, fetchedMessages]);
 
   const onSubmit = async (values: MessageFormValues) => {
     if (values.text === "") return;
@@ -121,7 +131,10 @@ const ChatScreen = (props: Props) => {
       </Formik>
       {typingUsers.size > 0 && (
         <Text style={styles.typingText}>
-          {Array.from(typingUsers).join(", ")} is typing...
+          {typingUsers.size <= 2
+            ? Array.from(typingUsers).join(", ")
+            : "Several users are "}
+          typing...
         </Text>
       )}
       <ScrollView style={styles.messages} ref={messagesRef}>
