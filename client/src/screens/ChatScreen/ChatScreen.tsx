@@ -7,6 +7,7 @@ import {
   TextStyle,
   View,
   ViewStyle,
+  ActivityIndicator,
 } from "react-native";
 import { Message as MessageComponent } from "./components";
 import { Formik } from "formik";
@@ -31,11 +32,12 @@ type Styles = {
 };
 
 const ChatScreen = (props: Props) => {
-  const { room, username } = useSelector(selectChat);
+  const { room, user } = useSelector(selectChat);
 
   const { socket, messageService } = props.route.params;
 
-  const { data: fetchedMessages } = useMessagesByRoom(messageService, room);
+  const { data: fetchedMessages, isPending: isMessagesPending } =
+    useMessagesByRoom(messageService, room.name);
 
   const messagesRef = useRef<ScrollView>(null);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -45,7 +47,7 @@ const ChatScreen = (props: Props) => {
 
   let typingTimeout: NodeJS.Timeout | null = null;
 
-  props.navigation.setOptions({ title: room });
+  props.navigation.setOptions({ title: room.name });
 
   useEffect(() => {
     if (fetchedMessages) {
@@ -91,11 +93,11 @@ const ChatScreen = (props: Props) => {
     socket.emit("send_message", {
       text: values.text,
       room,
-      username,
+      username: user,
     });
     setMessages((currMessages) => [
       ...currMessages,
-      { username, text: values.text },
+      { username: user.username, text: values.text },
     ]);
     values.text = "";
   };
@@ -111,7 +113,7 @@ const ChatScreen = (props: Props) => {
                 handleChange("text")(text);
 
                 socket.emit("user_typing", {
-                  username,
+                  username: user,
                   room,
                   userIsTyping: true,
                 });
@@ -138,13 +140,17 @@ const ChatScreen = (props: Props) => {
         </Text>
       )}
       <ScrollView style={styles.messages} ref={messagesRef}>
-        {messages.map((msg, idx) => (
-          <MessageComponent
-            key={idx}
-            messageText={msg.text}
-            sender={msg.username !== username ? msg.username : undefined}
-          />
-        ))}
+        {isMessagesPending ? (
+          <ActivityIndicator size="large" />
+        ) : (
+          messages.map((msg, idx) => (
+            <MessageComponent
+              key={idx}
+              messageText={msg.text}
+              sender={msg.username !== user.username ? msg.username : undefined}
+            />
+          ))
+        )}
       </ScrollView>
     </View>
   );

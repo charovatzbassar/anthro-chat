@@ -1,7 +1,7 @@
 import { RoomService } from "@/services";
 import { catchAsync } from "@/utils";
 import express, { Request, Response } from "express";
-import { Router } from "express";
+import e, { Router } from "express";
 
 const router: Router = express.Router();
 
@@ -11,6 +11,13 @@ router
   .route("/")
   .get(
     catchAsync(async (req: Request, res: Response) => {
+      const { name } = req.query;
+
+      if (name) {
+        const room = await roomService.getByName(name as string);
+        return res.json(room);
+      }
+
       const rooms = await roomService.getAll();
       res.json(rooms);
     })
@@ -18,6 +25,12 @@ router
   .post(
     catchAsync(async (req: Request, res: Response) => {
       const { name } = req.body;
+
+      const existingRoom = await roomService.getByName(name);
+
+      if (existingRoom) {
+        return res.json(existingRoom);
+      }
 
       const newRoom = await roomService.create({ name });
 

@@ -1,7 +1,7 @@
 import { UserService } from "@/services";
 import { catchAsync } from "@/utils";
 import express, { Request, Response } from "express";
-import { Router } from "express";
+import e, { Router } from "express";
 
 const router: Router = express.Router();
 
@@ -11,6 +11,13 @@ router
   .route("/")
   .get(
     catchAsync(async (req: Request, res: Response) => {
+      const { username } = req.query;
+
+      if (username) {
+        const user = await userService.getByUsername(username as string);
+        return res.json(user);
+      }
+
       const users = await userService.getAll();
       res.json(users);
     })
@@ -18,6 +25,12 @@ router
   .post(
     catchAsync(async (req: Request, res: Response) => {
       const { username, password, email } = req.body;
+
+      const existingUser = await userService.getByUsername(username);
+
+      if (existingUser) {
+        return res.json(existingUser);
+      }
 
       const newUser = await userService.create({ username, password, email });
 

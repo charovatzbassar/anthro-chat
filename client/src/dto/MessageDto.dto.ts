@@ -14,11 +14,10 @@ class MessageDto {
     this.room =
       typeof data.room === "string" ? data.room : new RoomDto(data.room);
 
-    if (data.user && typeof data.user === "object" && "username" in data.user) {
-      this.user = new UserDto(data.user);
-    } else {
-      this.user = data.user;
-    }
+    this.user =
+      data.user && typeof data.user === "object" && "username" in data.user
+        ? new UserDto(data.user)
+        : data.user;
   }
 
   public toMessageState(): Message {

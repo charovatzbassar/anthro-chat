@@ -1,11 +1,18 @@
-import { MessageService } from "@/services";
+import { MessageService, RoomService, UserService } from "@/services";
 import { Socket } from "socket.io-client";
+
+export type InitParams = {
+  socket: Socket;
+  messageService: MessageService;
+  userService: UserService;
+  roomService: RoomService;
+};
 
 export type Message = { text: string; username: string };
 
 export type RootStackParamList = {
-  ChooseRoom: { socket: Socket };
-  Chat: { socket: Socket, messageService: MessageService };
+  ChooseRoom: InitParams;
+  Chat: InitParams;
 };
 
 export type MessageFormValues = {

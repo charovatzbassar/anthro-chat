@@ -1,7 +1,6 @@
 import { selectChat } from "@/store/slices/chatSlice";
 import { Colors } from "@/utils";
 import { RoomFormValues, RootStackParamList } from "@/utils/types";
-import { roomSchema } from "@/utils/validation";
 import { StackScreenProps } from "@react-navigation/stack";
 import { Formik } from "formik";
 import React from "react";
@@ -13,11 +12,11 @@ import {
   Button,
   TextStyle,
   Text,
-  AppState,
 } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import { actions as roomActions } from "@/store/slices/chatSlice";
 import { AppDispatch } from "@/store";
+import { useCreateRoom, useCreateUser } from "@/hooks";
 
 type Props = StackScreenProps<RootStackParamList, "ChooseRoom">;
 
@@ -32,10 +31,26 @@ const ChooseRoomScreen = (props: Props) => {
 
   const chat = useSelector(selectChat);
 
-  const { socket } = props.route.params;
+  const { socket, userService, roomService } = props.route.params;
+
+  const {
+    mutate: createUser,
+    data: newUser,
+    isSuccess: isUserSuccess,
+  } = useCreateUser(userService);
+  const {
+    mutate: createRoom,
+    data: newRoom,
+    isSuccess: isRoomSuccess,
+  } = useCreateRoom(roomService);
 
   const onSubmit = async (values: RoomFormValues) => {
     if (values.username === "" || values.room === "") return;
+
+    createUser({ username: values.username });
+    createRoom({ name: values.room });
+
+    if (!isUserSuccess || !isRoomSuccess) return;
 
     socket.emit("join_room", {
       room: values.room,
@@ -43,9 +58,10 @@ const ChooseRoomScreen = (props: Props) => {
       oldRoom: chat.room,
     });
 
-    dispatch(roomActions.setUsername({ username: values.username }));
-    dispatch(roomActions.setRoom({ room: values.room }));
-    props.navigation.navigate("Chat", { socket });
+    dispatch(roomActions.setUser({ user: newUser }));
+    dispatch(roomActions.setRoom({ room: newRoom }));
+
+    props.navigation.navigate("Chat", props.route.params);
   };
   return (
     <View style={styles.container}>

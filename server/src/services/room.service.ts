@@ -18,6 +18,9 @@ class RoomService implements BaseService<RoomDto> {
 
   public getById = async (id: string): Promise<RoomDto | null> =>
     await RoomModel.findById(id);
+
+  public getByName = async (name: string): Promise<RoomDto | null> =>
+    await RoomModel.findOne({ name });
 }
 
 export default RoomService;
