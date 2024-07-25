@@ -11,11 +11,16 @@ router
   .route("/")
   .get(
     catchAsync(async (req: Request, res: Response) => {
-      const { name } = req.query;
+      const { name, user } = req.query;
 
       if (name) {
         const room = await roomService.getByName(name as string);
         return res.json(room);
+      }
+
+      if (user) {
+        const rooms = await roomService.getByUser(user as string);
+        return res.json(rooms);
       }
 
       const rooms = await roomService.getAll();

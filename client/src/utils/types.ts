@@ -10,6 +10,12 @@ export type InitParams = {
   };
 };
 
+export type RootTabParamList = {
+  Browse: InitParams;
+  MyRooms: InitParams;
+  Profile: InitParams;
+};
+
 export type Message = { text: string; username: string };
 
 export type RootStackParamList = {

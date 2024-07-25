@@ -1,6 +1,7 @@
-import { RoomModel } from "@/models";
+import { RoomModel, RoomUserModel } from "@/models";
 import { RoomDto } from "@/dto";
 import { BaseService } from "./BaseService";
+import { Types } from "mongoose";
 
 class RoomService implements BaseService<RoomDto> {
   public create = async (data: RoomDto): Promise<RoomDto> =>
@@ -21,6 +22,14 @@ class RoomService implements BaseService<RoomDto> {
 
   public getByName = async (name: string): Promise<RoomDto | null> =>
     await RoomModel.findOne({ name });
+
+  public getByUser = async (userId: string): Promise<Types.ObjectId[]> => {
+    const userRooms = await RoomUserModel.find({ user: userId }).populate(
+      "room"
+    );
+
+    return userRooms.map((roomUser) => roomUser.room);
+  };
 }
 
 export default RoomService;
