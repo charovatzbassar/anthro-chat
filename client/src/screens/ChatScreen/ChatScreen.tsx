@@ -18,7 +18,7 @@ import { useSelector } from "react-redux";
 import { selectChat } from "@/store/slices/chatSlice";
 import { StackScreenProps } from "@react-navigation/stack";
 import { USER_TYPING_TIMEOUT_LENGTH } from "@/utils/constants";
-import { useMessagesByRoom } from "@/hooks";
+import { useCreateMessage, useMessagesByRoom } from "@/hooks";
 import { MessageDto } from "@/dto";
 
 type Props = StackScreenProps<RootStackParamList, "Chat">;
@@ -45,6 +45,8 @@ const ChatScreen = (props: Props) => {
     new Set<string>()
   );
 
+  const { mutate: createMessage } = useCreateMessage(messageService);
+
   let typingTimeout: NodeJS.Timeout | null = null;
 
   props.navigation.setOptions({ title: room.name });
@@ -53,7 +55,12 @@ const ChatScreen = (props: Props) => {
     if (fetchedMessages) {
       setMessages(
         fetchedMessages.map((msg) => {
-          const messageDto = new MessageDto(msg);
+          const messageDto = new MessageDto(
+            msg.text,
+            msg.room,
+            msg.user,
+            msg._id
+          );
           return messageDto.toMessageState();
         })
       );
@@ -89,6 +96,8 @@ const ChatScreen = (props: Props) => {
 
   const onSubmit = async (values: MessageFormValues) => {
     if (values.text === "") return;
+
+    createMessage(new MessageDto(values.text, room._id || "", user._id || ""));
 
     socket.emit("send_message", {
       text: values.text,

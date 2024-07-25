@@ -2,9 +2,9 @@ class RoomDto {
   public _id?: string;
   public name: string;
 
-  constructor(data: RoomDto) {
-    this._id = data._id;
-    this.name = data.name;
+  constructor(name: string, _id?: string) {
+    this._id = _id;
+    this.name = name;
   }
 }
 

@@ -4,11 +4,16 @@ class UserDto {
   public email?: string;
   public password?: string;
 
-  constructor(data: UserDto) {
-    this._id = data._id;
-    this.username = data.username;
-    this.email = data.email;
-    this.password = data.password;
+  constructor(
+    username: string,
+    email?: string,
+    password?: string,
+    _id?: string
+  ) {
+    this._id = _id;
+    this.username = username;
+    this.email = email;
+    this.password = password;
   }
 }
 

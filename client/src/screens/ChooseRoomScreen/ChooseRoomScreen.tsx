@@ -44,13 +44,11 @@ const ChooseRoomScreen = (props: Props) => {
     isSuccess: isRoomSuccess,
   } = useCreateRoom(roomService);
 
-  const onSubmit = async (values: RoomFormValues) => {
+  const onSubmit = (values: RoomFormValues) => {
     if (values.username === "" || values.room === "") return;
 
     createUser({ username: values.username });
     createRoom({ name: values.room });
-
-    if (!isUserSuccess || !isRoomSuccess) return;
 
     socket.emit("join_room", {
       room: values.room,
@@ -61,7 +59,9 @@ const ChooseRoomScreen = (props: Props) => {
     dispatch(roomActions.setUser({ user: newUser }));
     dispatch(roomActions.setRoom({ room: newRoom }));
 
-    props.navigation.navigate("Chat", props.route.params);
+    if (isUserSuccess && isRoomSuccess) {
+      props.navigation.navigate("Chat", props.route.params);
+    }
   };
   return (
     <View style={styles.container}>

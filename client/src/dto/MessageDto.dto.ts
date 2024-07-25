@@ -7,17 +7,21 @@ class MessageDto {
   public room: RoomDto | string;
   public user: UserDto | string;
 
-  constructor(data: MessageDto) {
-    this._id = data._id;
-    this.text = data.text;
+  constructor(
+    text: string,
+    room: RoomDto | string,
+    user: UserDto | string,
+    _id?: string
+  ) {
+    this._id = _id;
+    this.text = text;
 
-    this.room =
-      typeof data.room === "string" ? data.room : new RoomDto(data.room);
+    this.room = typeof room === "string" ? room : new RoomDto(room.name, room._id);
 
     this.user =
-      data.user && typeof data.user === "object" && "username" in data.user
-        ? new UserDto(data.user)
-        : data.user;
+      user && typeof user === "object" && "username" in user
+        ? new UserDto(user.username, user.email, user.password, user._id)
+        : user;
   }
 
   public toMessageState(): Message {
