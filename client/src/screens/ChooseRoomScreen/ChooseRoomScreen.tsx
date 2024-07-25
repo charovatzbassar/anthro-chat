@@ -31,18 +31,18 @@ const ChooseRoomScreen = (props: Props) => {
 
   const chat = useSelector(selectChat);
 
-  const { socket, userService, roomService } = props.route.params;
+  const { socket, services } = props.route.params;
 
   const {
     mutate: createUser,
     data: newUser,
     isSuccess: isUserSuccess,
-  } = useCreateUser(userService);
+  } = useCreateUser(services.userService);
   const {
     mutate: createRoom,
     data: newRoom,
     isSuccess: isRoomSuccess,
-  } = useCreateRoom(roomService);
+  } = useCreateRoom(services.roomService);
 
   const onSubmit = (values: RoomFormValues) => {
     if (values.username === "" || values.room === "") return;

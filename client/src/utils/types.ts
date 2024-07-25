@@ -3,9 +3,11 @@ import { Socket } from "socket.io-client";
 
 export type InitParams = {
   socket: Socket;
-  messageService: MessageService;
-  userService: UserService;
-  roomService: RoomService;
+  services: {
+    messageService: MessageService;
+    userService: UserService;
+    roomService: RoomService;
+  };
 };
 
 export type Message = { text: string; username: string };

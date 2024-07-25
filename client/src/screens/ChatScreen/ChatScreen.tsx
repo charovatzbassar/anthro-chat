@@ -34,10 +34,10 @@ type Styles = {
 const ChatScreen = (props: Props) => {
   const { room, user } = useSelector(selectChat);
 
-  const { socket, messageService } = props.route.params;
+  const { socket, services } = props.route.params;
 
   const { data: fetchedMessages, isPending: isMessagesPending } =
-    useMessagesByRoom(messageService, room.name);
+    useMessagesByRoom(services.messageService, room.name);
 
   const messagesRef = useRef<ScrollView>(null);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -45,7 +45,7 @@ const ChatScreen = (props: Props) => {
     new Set<string>()
   );
 
-  const { mutate: createMessage } = useCreateMessage(messageService);
+  const { mutate: createMessage } = useCreateMessage(services.messageService);
 
   let typingTimeout: NodeJS.Timeout | null = null;
 

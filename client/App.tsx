@@ -19,9 +19,11 @@ const initParams: InitParams = {
   socket: io(SERVER_URL, {
     transports: ["websocket"],
   }),
-  messageService: new MessageService(),
-  userService: new UserService(),
-  roomService: new RoomService(),
+  services: {
+    messageService: new MessageService(),
+    userService: new UserService(),
+    roomService: new RoomService(),
+  },
 };
 
 const App: React.FC<{}> = () => {
