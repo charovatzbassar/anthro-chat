@@ -7,6 +7,7 @@ import {
   TextStyle,
   View,
   ViewStyle,
+  ActivityIndicator,
 } from "react-native";
 import { Message as MessageComponent } from "./components";
 import { Formik } from "formik";
@@ -17,6 +18,8 @@ import { useSelector } from "react-redux";
 import { selectChat } from "@/store/slices/chatSlice";
 import { StackScreenProps } from "@react-navigation/stack";
 import { USER_TYPING_TIMEOUT_LENGTH } from "@/utils/constants";
+import { useCreateMessage, useMessagesByRoom } from "@/hooks";
+import { MessageDto } from "@/dto";
 
 type Props = StackScreenProps<RootStackParamList, "Chat">;
 
@@ -29,9 +32,12 @@ type Styles = {
 };
 
 const ChatScreen = (props: Props) => {
-  const { room, username } = useSelector(selectChat);
+  const { room, user } = useSelector(selectChat);
 
-  const { socket } = props.route.params;
+  const { socket, messageService } = props.route.params;
+
+  const { data: fetchedMessages, isPending: isMessagesPending } =
+    useMessagesByRoom(messageService, room.name);
 
   const messagesRef = useRef<ScrollView>(null);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -39,9 +45,27 @@ const ChatScreen = (props: Props) => {
     new Set<string>()
   );
 
+  const { mutate: createMessage } = useCreateMessage(messageService);
+
   let typingTimeout: NodeJS.Timeout | null = null;
 
-  props.navigation.setOptions({ title: room });
+  props.navigation.setOptions({ title: room.name });
+
+  useEffect(() => {
+    if (fetchedMessages) {
+      setMessages(
+        fetchedMessages.map((msg) => {
+          const messageDto = new MessageDto(
+            msg.text,
+            msg.room,
+            msg.user,
+            msg._id
+          );
+          return messageDto.toMessageState();
+        })
+      );
+    }
+  }, [fetchedMessages]);
 
   useEffect(() => {
     socket.on("receive_message", (data) => {
@@ -75,14 +99,16 @@ const ChatScreen = (props: Props) => {
   const onSubmit = async (values: MessageFormValues) => {
     if (values.text === "") return;
 
+    createMessage(new MessageDto(values.text, room._id || "", user._id || ""));
+
     socket.emit("send_message", {
       text: values.text,
-      room,
-      username,
+      room: room.name,
+      username: user.username,
     });
     setMessages((currMessages) => [
       ...currMessages,
-      { username, text: values.text },
+      { username: user.username, text: values.text },
     ]);
     values.text = "";
   };
@@ -98,8 +124,8 @@ const ChatScreen = (props: Props) => {
                 handleChange("text")(text);
 
                 socket.emit("user_typing", {
-                  username,
-                  room,
+                  username: user.username,
+                  room: room.name,
                   userIsTyping: true,
                 });
               }}
@@ -118,17 +144,23 @@ const ChatScreen = (props: Props) => {
       </Formik>
       {typingUsers.size > 0 && (
         <Text style={styles.typingText}>
-          {Array.from(typingUsers).join(", ")} is typing...
+          {typingUsers.size <= 2
+            ? Array.from(typingUsers).join(", ") + " is typing..."
+            : "Several users are typing..."}
         </Text>
       )}
       <ScrollView style={styles.messages} ref={messagesRef}>
-        {messages.map((msg, idx) => (
-          <MessageComponent
-            key={idx}
-            messageText={msg.text}
-            sender={msg.username !== username ? msg.username : undefined}
-          />
-        ))}
+        {isMessagesPending ? (
+          <ActivityIndicator size="large" />
+        ) : (
+          messages.map((msg, idx) => (
+            <MessageComponent
+              key={idx}
+              messageText={msg.text}
+              sender={msg.username !== user.username ? msg.username : undefined}
+            />
+          ))
+        )}
       </ScrollView>
     </View>
   );

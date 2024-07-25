@@ -1,15 +1,16 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { RootState } from "..";
+import { RoomDto, UserDto } from "@/dto";
 
 const chatSlice = createSlice({
   name: "chat",
   initialState: {
-    username: "",
-    room: "",
+    user: {} as UserDto,
+    room: {} as RoomDto,
   },
   reducers: {
-    setUsername: (state, action) => {
-      state.username = action.payload.username;
+    setUser: (state, action) => {
+      state.user = action.payload.user;
     },
     setRoom: (state, action) => {
       state.room = action.payload.room;

@@ -18,6 +18,9 @@ class UserService implements BaseService<UserDto> {
 
   public getById = async (id: string): Promise<UserDto | null> =>
     await UserModel.findById(id);
+
+  public getByUsername = async (username: string): Promise<UserDto | null> =>
+    await UserModel.findOne({ username });
 }
 
 export default UserService;
