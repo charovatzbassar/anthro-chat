@@ -53,11 +53,12 @@ const ChooseRoomScreen = (props: Props) => {
     socket.emit("join_room", {
       room: values.room,
       username: values.username,
-      oldRoom: chat.room,
+      oldRoom: chat.room ? chat.room.name : newRoom,
     });
 
     dispatch(roomActions.setUser({ user: newUser }));
     dispatch(roomActions.setRoom({ room: newRoom }));
+
 
     if (isUserSuccess && isRoomSuccess) {
       props.navigation.navigate("Chat", props.route.params);

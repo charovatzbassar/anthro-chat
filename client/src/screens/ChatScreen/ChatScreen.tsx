@@ -65,7 +65,9 @@ const ChatScreen = (props: Props) => {
         })
       );
     }
+  }, [fetchedMessages]);
 
+  useEffect(() => {
     socket.on("receive_message", (data) => {
       setMessages((currMessages) => [
         ...currMessages,
@@ -92,7 +94,7 @@ const ChatScreen = (props: Props) => {
     if (messagesRef.current) {
       messagesRef.current.scrollToEnd({ animated: false });
     }
-  }, [socket, fetchedMessages]);
+  }, [socket]);
 
   const onSubmit = async (values: MessageFormValues) => {
     if (values.text === "") return;
@@ -101,8 +103,8 @@ const ChatScreen = (props: Props) => {
 
     socket.emit("send_message", {
       text: values.text,
-      room,
-      username: user,
+      room: room.name,
+      username: user.username,
     });
     setMessages((currMessages) => [
       ...currMessages,
@@ -122,8 +124,8 @@ const ChatScreen = (props: Props) => {
                 handleChange("text")(text);
 
                 socket.emit("user_typing", {
-                  username: user,
-                  room,
+                  username: user.username,
+                  room: room.name,
                   userIsTyping: true,
                 });
               }}
@@ -143,9 +145,8 @@ const ChatScreen = (props: Props) => {
       {typingUsers.size > 0 && (
         <Text style={styles.typingText}>
           {typingUsers.size <= 2
-            ? Array.from(typingUsers).join(", ")
-            : "Several users are "}
-          typing...
+            ? Array.from(typingUsers).join(", ") + " is typing..."
+            : "Several users are typing..."}
         </Text>
       )}
       <ScrollView style={styles.messages} ref={messagesRef}>
