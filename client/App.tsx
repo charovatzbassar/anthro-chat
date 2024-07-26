@@ -2,13 +2,13 @@ import React from "react";
 import {
   BrowseRoomsScreen,
   ChatScreen,
-  ChooseRoomScreen,
+  LoginScreen,
   MyRoomsScreen,
   ProfileScreen,
 } from "@/screens";
 import { Button, StyleSheet, View } from "react-native";
 import { Colors, queryClient } from "@/utils";
-import { createStackNavigator } from "@react-navigation/stack";
+import { createStackNavigator, StackScreenProps } from "@react-navigation/stack";
 import { NavigationContainer } from "@react-navigation/native";
 import { StatusBar } from "expo-status-bar";
 import { Provider } from "react-redux";
@@ -40,10 +40,14 @@ const initParams: InitParams = {
   },
 };
 
+type BottomTabProps = StackScreenProps<RootStackParamList, "BottomTab">;
+
 const StackNavigation: React.FC<{}> = () => {
   return (
     <Stack.Navigator
+      initialRouteName="Login"
       screenOptions={{
+        headerShown: false,
         title: "AnthroChat",
         headerStyle: {
           backgroundColor: Colors["darkBlue"],
@@ -52,16 +56,70 @@ const StackNavigation: React.FC<{}> = () => {
       }}
     >
       <Stack.Screen
-        name="ChooseRoom"
-        component={ChooseRoomScreen}
+        name="Login"
+        component={LoginScreen}
         initialParams={initParams}
       />
+      <Stack.Screen name="BottomTab" component={BottomTabNavigation} />
       <Stack.Screen
         name="Chat"
         component={ChatScreen}
         initialParams={initParams}
       />
     </Stack.Navigator>
+  );
+};
+
+const BottomTabNavigation: React.FC<BottomTabProps> = (props: BottomTabProps) => {
+  return (
+    <Tab.Navigator
+      initialRouteName="MyRooms"
+      screenOptions={{
+        headerRight: () => <TextButton text="Log out" onPress={() => props.navigation.navigate("Login", props.route.params)} />,
+        headerStyle: {
+          backgroundColor: Colors["darkBlue"],
+        },
+        headerTintColor: Colors["yellow500"],
+        tabBarStyle: {
+          backgroundColor: Colors["darkBlue"],
+        },
+        tabBarActiveTintColor: Colors["yellow500"],
+        tabBarShowLabel: false,
+      }}
+    >
+      <Tab.Screen
+        name="Browse"
+        component={BrowseRoomsScreen}
+        initialParams={initParams}
+        options={{
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="search" size={size} color={color} />
+          ),
+          title: "Browse Rooms",
+        }}
+      />
+      <Tab.Screen
+        name="MyRooms"
+        component={MyRoomsScreen}
+        initialParams={initParams}
+        options={{
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="chatbubbles" size={size} color={color} />
+          ),
+          title: "My Rooms",
+        }}
+      />
+      <Tab.Screen
+        name="Profile"
+        component={ProfileScreen}
+        initialParams={initParams}
+        options={{
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="person" size={size} color={color} />
+          ),
+        }}
+      />
+    </Tab.Navigator>
   );
 };
 
@@ -72,56 +130,7 @@ const App: React.FC<{}> = () => {
       <QueryClientProvider client={queryClient}>
         <Provider store={store}>
           <NavigationContainer>
-            <Tab.Navigator
-              initialRouteName="MyRooms"
-              screenOptions={{
-                headerRight: () => (
-                  <TextButton text="Log out" onPress={() => {}} />
-                ),
-                headerStyle: {
-                  backgroundColor: Colors["darkBlue"],
-                },
-                headerTintColor: Colors["yellow500"],
-                tabBarStyle: {
-                  backgroundColor: Colors["darkBlue"],
-                },
-                tabBarActiveTintColor: Colors["yellow500"],
-                tabBarShowLabel: false,
-              }}
-            >
-              <Tab.Screen
-                name="Browse"
-                component={BrowseRoomsScreen}
-                initialParams={initParams}
-                options={{
-                  tabBarIcon: ({ color, size }) => (
-                    <Ionicons name="search" size={size} color={color} />
-                  ),
-                  title: "Browse Rooms",
-                }}
-              />
-              <Tab.Screen
-                name="MyRooms"
-                component={MyRoomsScreen}
-                initialParams={initParams}
-                options={{
-                  tabBarIcon: ({ color, size }) => (
-                    <Ionicons name="chatbubbles" size={size} color={color} />
-                  ),
-                  title: "My Rooms",
-                }}
-              />
-              <Tab.Screen
-                name="Profile"
-                component={ProfileScreen}
-                initialParams={initParams}
-                options={{
-                  tabBarIcon: ({ color, size }) => (
-                    <Ionicons name="person" size={size} color={color} />
-                  ),
-                }}
-              />
-            </Tab.Navigator>
+            <StackNavigation />
           </NavigationContainer>
         </Provider>
       </QueryClientProvider>

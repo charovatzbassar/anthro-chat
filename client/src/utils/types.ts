@@ -19,7 +19,8 @@ export type RootTabParamList = {
 export type Message = { text: string; username: string };
 
 export type RootStackParamList = {
-  ChooseRoom: InitParams;
+  Login: InitParams;
+  BottomTab: InitParams;
   Chat: InitParams;
 };
 
@@ -27,7 +28,13 @@ export type MessageFormValues = {
   text: string;
 };
 
-export type RoomFormValues = {
+export type LoginFormValues = {
   username: string;
-  room: string;
+  password: string;
+};
+
+export type RegisterFormValues = {
+  username: string;
+  password: string;
+  email: string;
 };
