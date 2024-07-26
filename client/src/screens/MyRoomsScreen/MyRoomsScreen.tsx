@@ -1,15 +1,22 @@
-import { MyRoomItem } from "@/components";
+import { MyRoomItem, TextButton } from "@/components";
 import { useRoomsByUser } from "@/hooks";
 import { selectChat } from "@/store/slices/chatSlice";
 import { Colors } from "@/utils";
 import { RootTabParamList } from "@/utils/types";
 import { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
+import { Formik } from "formik";
 import React from "react";
-import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
+import {
+  ActivityIndicator,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
 import { FlatList } from "react-native";
 import { useSelector } from "react-redux";
 
-type Props = BottomTabScreenProps<RootTabParamList, "Browse">;
+type Props = BottomTabScreenProps<RootTabParamList, "MyRooms">;
 
 const MyRoomsScreen = (props: Props) => {
   const { services } = props.route.params;
@@ -20,6 +27,10 @@ const MyRoomsScreen = (props: Props) => {
     isPending,
     isError,
   } = useRoomsByUser(services.roomService, user._id || "");
+
+  const onSubmit = (values: { name: string }) => {
+    console.log(values);
+  };
 
   return (
     <View style={styles.screen}>
@@ -37,6 +48,21 @@ const MyRoomsScreen = (props: Props) => {
           )}
         />
       )}
+      <Formik initialValues={{ name: "" }} onSubmit={onSubmit}>
+        {({ handleChange, handleBlur, handleSubmit, values }) => (
+          <View style={styles.addRoom}>
+            <TextInput
+              style={styles.input}
+              placeholder="Type room name"
+              placeholderTextColor={Colors["yellow500"]}
+              onChangeText={handleChange("name")}
+              onBlur={handleBlur("name")}
+              value={values.name}
+            />
+            <TextButton text="JOIN" onPress={() => handleSubmit()} />
+          </View>
+        )}
+      </Formik>
     </View>
   );
 };
@@ -45,6 +71,23 @@ const styles = StyleSheet.create({
   screen: {
     flex: 1,
     padding: 12,
+    backgroundColor: Colors["darkBlue"],
+  },
+  input: {
+    backgroundColor: Colors["darkBlue"],
+    color: Colors["yellow500"],
+    borderColor: Colors["yellow500"],
+    borderWidth: 1,
+    borderRadius: 4,
+    padding: 8,
+    marginVertical: 12,
+    width: "80%",
+  },
+  addRoom: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    padding: 4,
     backgroundColor: Colors["darkBlue"],
   },
 });
