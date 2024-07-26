@@ -1,30 +1,21 @@
 import { RoomDto } from "@/dto";
-import { useRoomUserCount } from "@/hooks";
-import { RoomService } from "@/services";
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 import TextButton from "../TextButton";
 
 type Props = {
   room: RoomDto;
-  roomService: RoomService;
   onPress: () => void;
 };
 
-const RoomItem = (props: Props) => {
-  const { data: memberCount } = useRoomUserCount(
-    props.roomService,
-    props.room._id || ""
-  );
-
+const MyRoomItem = (props: Props) => {
   return (
     <View style={styles.roomContainer}>
       <View>
         <Text style={styles.roomTitle}>{props.room.name}</Text>
-        <Text>Members: {memberCount}</Text>
       </View>
       <View>
-        <TextButton text="Join" onPress={props.onPress} color="green" />
+        <TextButton text="chat" onPress={props.onPress} color="green" />
       </View>
     </View>
   );
@@ -46,4 +37,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default RoomItem;
+export default MyRoomItem;

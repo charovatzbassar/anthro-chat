@@ -16,7 +16,7 @@ const BrowseRoomsScreen = (props: Props) => {
   return (
     <View style={styles.screen}>
       {isPending ? (
-        <ActivityIndicator size="large" color={Colors["darkBlue"]} />
+        <ActivityIndicator size="large" color={Colors["yellow500"]} />
       ) : (
         <FlatList
           data={rooms}
