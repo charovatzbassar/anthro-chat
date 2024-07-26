@@ -48,6 +48,12 @@ router
   .get(
     catchAsync(async (req: Request, res: Response) => {
       const { id } = req.params;
+      const { count } = req.query;
+
+      if (count) {
+        const userCount = await roomService.getRoomUserCount(id);
+        return res.json(userCount);
+      }
 
       const room = await roomService.getById(id);
 

@@ -27,8 +27,13 @@ class RoomService implements BaseService<RoomDto> {
     const userRooms = await RoomUserModel.find({ user: userId }).populate(
       "room"
     );
-
     return userRooms.map((roomUser) => roomUser.room);
+  };
+
+  public getRoomUserCount = async (roomId: string): Promise<number> => {
+    const roomUsers = await RoomUserModel.find({ room: roomId });
+
+    return roomUsers.length;
   };
 }
 

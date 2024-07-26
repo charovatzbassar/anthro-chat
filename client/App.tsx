@@ -24,6 +24,7 @@ import { MessageService, RoomService, UserService } from "@/services";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Ionicons } from "@expo/vector-icons";
+import { TextButton } from "@/components";
 
 const Stack = createStackNavigator<RootStackParamList>();
 const Tab = createBottomTabNavigator<RootTabParamList>();
@@ -71,15 +72,32 @@ const App: React.FC<{}> = () => {
       <QueryClientProvider client={queryClient}>
         <Provider store={store}>
           <NavigationContainer>
-            <Tab.Navigator screenOptions={{
-              headerRight: () => <Button title="Log out" />,
-            }}>
+            <Tab.Navigator
+              initialRouteName="MyRooms"
+              screenOptions={{
+                headerRight: () => (
+                  <TextButton text="Log out" onPress={() => {}} />
+                ),
+                headerStyle: {
+                  backgroundColor: Colors["darkBlue"],
+                },
+                headerTintColor: Colors["yellow500"],
+                tabBarStyle: {
+                  backgroundColor: Colors["darkBlue"],
+                },
+                tabBarActiveTintColor: Colors["yellow500"],
+                tabBarShowLabel: false,
+              }}
+            >
               <Tab.Screen
                 name="Browse"
                 component={BrowseRoomsScreen}
                 initialParams={initParams}
                 options={{
-                  tabBarIcon: () => <Ionicons name="search" size={24} />,
+                  tabBarIcon: ({ color, size }) => (
+                    <Ionicons name="search" size={size} color={color} />
+                  ),
+                  title: "Browse Rooms",
                 }}
               />
               <Tab.Screen
@@ -87,7 +105,10 @@ const App: React.FC<{}> = () => {
                 component={MyRoomsScreen}
                 initialParams={initParams}
                 options={{
-                  tabBarIcon: () => <Ionicons name="chatbubbles" size={24} />,
+                  tabBarIcon: ({ color, size }) => (
+                    <Ionicons name="chatbubbles" size={size} color={color} />
+                  ),
+                  title: "My Rooms",
                 }}
               />
               <Tab.Screen
@@ -95,7 +116,9 @@ const App: React.FC<{}> = () => {
                 component={ProfileScreen}
                 initialParams={initParams}
                 options={{
-                  tabBarIcon: () => <Ionicons name="person" size={24} />,
+                  tabBarIcon: ({ color, size }) => (
+                    <Ionicons name="person" size={size} color={color} />
+                  ),
                 }}
               />
             </Tab.Navigator>
