@@ -5,10 +5,14 @@ import {
   LoginScreen,
   MyRoomsScreen,
   ProfileScreen,
+  RegisterScreen,
 } from "@/screens";
 import { Button, StyleSheet, View } from "react-native";
 import { Colors, queryClient } from "@/utils";
-import { createStackNavigator, StackScreenProps } from "@react-navigation/stack";
+import {
+  createStackNavigator,
+  StackScreenProps,
+} from "@react-navigation/stack";
 import { NavigationContainer } from "@react-navigation/native";
 import { StatusBar } from "expo-status-bar";
 import { Provider } from "react-redux";
@@ -60,6 +64,11 @@ const StackNavigation: React.FC<{}> = () => {
         component={LoginScreen}
         initialParams={initParams}
       />
+      <Stack.Screen
+        name="Register"
+        component={RegisterScreen}
+        initialParams={initParams}
+      />
       <Stack.Screen name="BottomTab" component={BottomTabNavigation} />
       <Stack.Screen
         name="Chat"
@@ -70,12 +79,21 @@ const StackNavigation: React.FC<{}> = () => {
   );
 };
 
-const BottomTabNavigation: React.FC<BottomTabProps> = (props: BottomTabProps) => {
+const BottomTabNavigation: React.FC<BottomTabProps> = (
+  props: BottomTabProps
+) => {
   return (
     <Tab.Navigator
       initialRouteName="MyRooms"
       screenOptions={{
-        headerRight: () => <TextButton text="Log out" onPress={() => props.navigation.navigate("Login", props.route.params)} />,
+        headerRight: () => (
+          <TextButton
+            text="Log out"
+            onPress={() =>
+              props.navigation.replace("Login", props.route.params)
+            }
+          />
+        ),
         headerStyle: {
           backgroundColor: Colors["darkBlue"],
         },

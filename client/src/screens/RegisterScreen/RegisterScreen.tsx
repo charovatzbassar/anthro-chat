@@ -1,6 +1,6 @@
 import { TextButton } from "@/components";
 import { Colors } from "@/utils";
-import { LoginFormValues, RootStackParamList } from "@/utils/types";
+import { RegisterFormValues, RootStackParamList } from "@/utils/types";
 import { StackScreenProps } from "@react-navigation/stack";
 import { Formik } from "formik";
 import React from "react";
@@ -14,7 +14,7 @@ import {
   ViewStyle,
 } from "react-native";
 
-type Props = StackScreenProps<RootStackParamList, "Login">;
+type Props = StackScreenProps<RootStackParamList, "Register">;
 
 type Styles = {
   container: ViewStyle;
@@ -23,15 +23,15 @@ type Styles = {
   submit: ViewStyle;
 };
 
-const LoginScreen = (props: Props) => {
-  const onSubmit = (values: LoginFormValues) => {
+const RegisterScreen = (props: Props) => {
+  const onSubmit = (values: RegisterFormValues) => {
     props.navigation.replace("BottomTab", props.route.params);
   };
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Log in to AnthroChat!</Text>
+      <Text style={styles.title}>Register to AnthroChat!</Text>
       <Formik
-        initialValues={{ username: "", password: "" }}
+        initialValues={{ username: "", password: "", email: "" }}
         onSubmit={onSubmit}
       >
         {({ handleSubmit, handleBlur, handleChange, values }) => (
@@ -46,6 +46,14 @@ const LoginScreen = (props: Props) => {
             />
             <TextInput
               style={styles.input}
+              onChangeText={handleChange("email")}
+              onBlur={handleBlur("email")}
+              placeholder="Email"
+              placeholderTextColor={Colors["yellow500"]}
+              value={values.email}
+            />
+            <TextInput
+              style={styles.input}
               onChangeText={handleChange("password")}
               onBlur={handleBlur("password")}
               placeholder="Password"
@@ -56,16 +64,16 @@ const LoginScreen = (props: Props) => {
             <View style={styles.submit}>
               <TextButton
                 onPress={handleSubmit}
-                text="Log in"
+                text="Register"
                 color={Colors["yellow500"]}
               />
               <Pressable
                 onPress={() =>
-                  props.navigation.replace("Register", props.route.params)
+                  props.navigation.replace("Login", props.route.params)
                 }
               >
                 <Text style={{ color: Colors["yellow500"], marginTop: 12 }}>
-                  Don't have an account? Register here!
+                  Already have an account? Log in here!
                 </Text>
               </Pressable>
             </View>
@@ -104,4 +112,4 @@ const styles = StyleSheet.create<Styles>({
   },
 });
 
-export default LoginScreen;
+export default RegisterScreen;
