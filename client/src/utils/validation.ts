@@ -1,10 +1,19 @@
 import * as Yup from "yup";
 
-export const messageSchema = Yup.object().shape({
-  message: Yup.string().required("Message is required"),
-});
+const Validation = {
+  loginSchema: Yup.object().shape({
+    username: Yup.string().required("Username is required"),
+    password: Yup.string().required("Password is required"),
+  }),
 
-export const roomSchema = Yup.object().shape({
-  username: Yup.string().required("Username is required"),
-  room: Yup.string().required("Room is required"),
-});
+  registerSchema: Yup.object().shape({
+    username: Yup.string().required("Username is required"),
+    password: Yup.string().required("Password is required"),
+    repeatPassword: Yup.string()
+      .oneOf([Yup.ref("password")], "Passwords must match")
+      .required("Password is required"),
+    email: Yup.string().email().required("Email is required"),
+  }),
+};
+
+export default Validation;

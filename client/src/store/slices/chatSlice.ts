@@ -12,8 +12,14 @@ const chatSlice = createSlice({
     setUser: (state, action) => {
       state.user = action.payload.user;
     },
+    clearUser: (state) => {
+      state.user = {} as UserDto;
+    },
     setRoom: (state, action) => {
       state.room = action.payload.room;
+    },
+    clearRoom: (state) => {
+      state.room = {} as RoomDto;
     },
   },
 });

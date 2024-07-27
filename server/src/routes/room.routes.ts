@@ -11,11 +11,16 @@ router
   .route("/")
   .get(
     catchAsync(async (req: Request, res: Response) => {
-      const { name } = req.query;
+      const { name, user } = req.query;
 
       if (name) {
         const room = await roomService.getByName(name as string);
         return res.json(room);
+      }
+
+      if (user) {
+        const rooms = await roomService.getByUser(user as string);
+        return res.json(rooms);
       }
 
       const rooms = await roomService.getAll();
@@ -43,6 +48,12 @@ router
   .get(
     catchAsync(async (req: Request, res: Response) => {
       const { id } = req.params;
+      const { count } = req.query;
+
+      if (count) {
+        const userCount = await roomService.getRoomUserCount(id);
+        return res.json(userCount);
+      }
 
       const room = await roomService.getById(id);
 

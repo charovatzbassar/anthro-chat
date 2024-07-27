@@ -10,10 +10,18 @@ export type InitParams = {
   };
 };
 
+export type RootTabParamList = {
+  Browse: InitParams & { goToChatScreen: () => void };
+  MyRooms: InitParams & { goToChatScreen: () => void };
+  Profile: InitParams;
+};
+
 export type Message = { text: string; username: string };
 
 export type RootStackParamList = {
-  ChooseRoom: InitParams;
+  Login: InitParams;
+  Register: InitParams;
+  BottomTab: InitParams;
   Chat: InitParams;
 };
 
@@ -21,7 +29,14 @@ export type MessageFormValues = {
   text: string;
 };
 
-export type RoomFormValues = {
+export type LoginFormValues = {
   username: string;
-  room: string;
+  password: string;
+};
+
+export type RegisterFormValues = {
+  username: string;
+  password: string;
+  repeatPassword: string;
+  email: string;
 };
