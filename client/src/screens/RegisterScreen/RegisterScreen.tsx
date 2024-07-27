@@ -1,10 +1,13 @@
 import { TextButton } from "@/components";
-import { Colors } from "@/utils";
+import { AppDispatch } from "@/store";
+import { actions as chatActions } from "@/store/slices/chatSlice";
+import { Colors, Validation } from "@/utils";
 import { RegisterFormValues, RootStackParamList } from "@/utils/types";
 import { StackScreenProps } from "@react-navigation/stack";
 import { Formik } from "formik";
 import React from "react";
 import {
+  Alert,
   Pressable,
   StyleSheet,
   Text,
@@ -13,6 +16,7 @@ import {
   View,
   ViewStyle,
 } from "react-native";
+import { useDispatch } from "react-redux";
 
 type Props = StackScreenProps<RootStackParamList, "Register">;
 
@@ -24,14 +28,37 @@ type Styles = {
 };
 
 const RegisterScreen = (props: Props) => {
-  const onSubmit = (values: RegisterFormValues) => {
+  const dispatch = useDispatch<AppDispatch>();
+
+  const onSubmit = async (values: RegisterFormValues) => {
+    const isValid = await Validation.registerSchema.isValid(values);
+
+    if (!isValid) {
+      Alert.alert("Invalid input", "Please enter valid information");
+      return;
+    }
+
+    dispatch(
+      chatActions.setUser({
+        user: {
+          username: values.username,
+          email: values.email,
+          password: values.password,
+        },
+      })
+    );
     props.navigation.replace("BottomTab", props.route.params);
   };
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Register to AnthroChat!</Text>
       <Formik
-        initialValues={{ username: "", password: "", email: "" }}
+        initialValues={{
+          username: "",
+          password: "",
+          email: "",
+          repeatPassword: "",
+        }}
         onSubmit={onSubmit}
       >
         {({ handleSubmit, handleBlur, handleChange, values }) => (
@@ -59,6 +86,15 @@ const RegisterScreen = (props: Props) => {
               placeholder="Password"
               placeholderTextColor={Colors["yellow500"]}
               value={values.password}
+              secureTextEntry={true}
+            />
+            <TextInput
+              style={styles.input}
+              onChangeText={handleChange("repeatPassword")}
+              onBlur={handleBlur("repeatPassword")}
+              placeholder="Repeat Password"
+              placeholderTextColor={Colors["yellow500"]}
+              value={values.repeatPassword}
               secureTextEntry={true}
             />
             <View style={styles.submit}>

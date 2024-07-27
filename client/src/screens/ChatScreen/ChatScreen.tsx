@@ -17,7 +17,7 @@ import { Message, MessageFormValues, RootStackParamList } from "@/utils/types";
 import { useSelector } from "react-redux";
 import { selectChat } from "@/store/slices/chatSlice";
 import { StackScreenProps } from "@react-navigation/stack";
-import { USER_TYPING_TIMEOUT_LENGTH } from "@/utils/constants";
+import { Constants } from "@/utils";
 import { useCreateMessage, useMessagesByRoom } from "@/hooks";
 import { MessageDto } from "@/dto";
 
@@ -46,6 +46,7 @@ const ChatScreen = (props: Props) => {
   );
 
   const { mutate: createMessage } = useCreateMessage(services.messageService);
+
 
   let typingTimeout: NodeJS.Timeout | null = null;
 
@@ -88,7 +89,7 @@ const ChatScreen = (props: Props) => {
           currTypingUsers.delete(data.username);
           return new Set(currTypingUsers);
         });
-      }, USER_TYPING_TIMEOUT_LENGTH);
+      }, Constants.USER_TYPING_TIMEOUT_LENGTH);
     });
 
     if (messagesRef.current) {

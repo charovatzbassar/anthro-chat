@@ -11,8 +11,8 @@ export type InitParams = {
 };
 
 export type RootTabParamList = {
-  Browse: InitParams;
-  MyRooms: InitParams;
+  Browse: InitParams & { goToChatScreen: () => void };
+  MyRooms: InitParams & { goToChatScreen: () => void };
   Profile: InitParams;
 };
 
@@ -37,5 +37,6 @@ export type LoginFormValues = {
 export type RegisterFormValues = {
   username: string;
   password: string;
+  repeatPassword: string;
   email: string;
 };

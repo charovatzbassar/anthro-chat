@@ -13,7 +13,7 @@ class RoomService extends BaseService<RoomDto> {
   findByUser = (userId: string): Promise<RoomDto[]> =>
     RestClient.get(`${super.endpoint}?user=${userId}`);
 
-  getRoomUserCount = (roomId: string): Promise<number> =>
+  getRoomUserCount = (roomId: string): Promise<number | null> =>
     RestClient.get(`${super.endpoint}/${roomId}?count=true`);
 }
 

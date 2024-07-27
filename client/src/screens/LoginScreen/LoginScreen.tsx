@@ -1,10 +1,12 @@
 import { TextButton } from "@/components";
-import { Colors } from "@/utils";
+import { AppDispatch } from "@/store";
+import { Colors, Validation } from "@/utils";
 import { LoginFormValues, RootStackParamList } from "@/utils/types";
 import { StackScreenProps } from "@react-navigation/stack";
 import { Formik } from "formik";
 import React from "react";
 import {
+  Alert,
   Pressable,
   StyleSheet,
   Text,
@@ -13,6 +15,8 @@ import {
   View,
   ViewStyle,
 } from "react-native";
+import { useDispatch } from "react-redux";
+import { actions as chatActions } from "@/store/slices/chatSlice";
 
 type Props = StackScreenProps<RootStackParamList, "Login">;
 
@@ -24,9 +28,30 @@ type Styles = {
 };
 
 const LoginScreen = (props: Props) => {
-  const onSubmit = (values: LoginFormValues) => {
+  const dispatch = useDispatch<AppDispatch>();
+
+  const onSubmit = async (values: LoginFormValues) => {
+    const isValid = await Validation.loginSchema.isValid(values);
+
+    if (!isValid) {
+      Alert.alert(
+        "Invalid input",
+        "Please enter a valid username and password"
+      );
+      return;
+    }
+
+    dispatch(
+      chatActions.setUser({
+        user: {
+          username: values.username,
+          password: values.password,
+        },
+      })
+    );
     props.navigation.replace("BottomTab", props.route.params);
   };
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Log in to AnthroChat!</Text>

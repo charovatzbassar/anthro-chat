@@ -1,6 +1,7 @@
 import { MyRoomItem, TextButton } from "@/components";
-import { useRoomsByUser } from "@/hooks";
-import { selectChat } from "@/store/slices/chatSlice";
+import { useCreateRoom, useRoomsByUser } from "@/hooks";
+import { AppDispatch } from "@/store";
+import { actions as chatActions, selectChat } from "@/store/slices/chatSlice";
 import { Colors } from "@/utils";
 import { RootTabParamList } from "@/utils/types";
 import { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
@@ -14,12 +15,12 @@ import {
   View,
 } from "react-native";
 import { FlatList } from "react-native";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 type Props = BottomTabScreenProps<RootTabParamList, "MyRooms">;
 
 const MyRoomsScreen = (props: Props) => {
-  const { services } = props.route.params;
+  const { services, goToChatScreen } = props.route.params;
   const { user } = useSelector(selectChat);
 
   const {
@@ -28,8 +29,15 @@ const MyRoomsScreen = (props: Props) => {
     isError,
   } = useRoomsByUser(services.roomService, user._id || "");
 
+  const { mutate: createRoom } = useCreateRoom(services.roomService);
+
+  const dispatch = useDispatch<AppDispatch>();
+
   const onSubmit = (values: { name: string }) => {
-    console.log(values);
+    if (values.name === "") return;
+
+    createRoom({ name: values.name });
+    values.name = "";
   };
 
   return (
@@ -37,14 +45,19 @@ const MyRoomsScreen = (props: Props) => {
       {isPending && (
         <ActivityIndicator size="large" color={Colors["yellow500"]} />
       )}
-      {isError && <Text>Error fetching rooms</Text>}
-      {rooms && rooms.length === 0 && <Text>No rooms found</Text>}
+      {isError && <Text style={styles.text}>Error fetching rooms</Text>}
+      {rooms && rooms.length === 0 && (
+        <Text style={styles.text}>No rooms found. Join a room!</Text>
+      )}
       {rooms && (
         <FlatList
           data={rooms}
           keyExtractor={(item) => item._id || ""}
           renderItem={({ item }) => (
-            <MyRoomItem room={item} onPress={() => {}} />
+            <MyRoomItem room={item} onPress={() => {
+              dispatch(chatActions.setRoom({ room: item }));
+              goToChatScreen();
+            }} />
           )}
         />
       )}
@@ -59,7 +72,7 @@ const MyRoomsScreen = (props: Props) => {
               onBlur={handleBlur("name")}
               value={values.name}
             />
-            <TextButton text="JOIN" onPress={() => handleSubmit()} />
+            <TextButton text="ADD" onPress={() => handleSubmit()} />
           </View>
         )}
       </Formik>
@@ -89,6 +102,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
     padding: 4,
     backgroundColor: Colors["darkBlue"],
+  },
+  text: {
+    color: Colors["yellow500"],
+    fontSize: 16,
   },
 });
 
