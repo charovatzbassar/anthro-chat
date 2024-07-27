@@ -2,21 +2,17 @@ import { Message } from "@/utils/types";
 import { RoomDto, UserDto } from "@/dto";
 
 class MessageDto {
-  public _id?: string;
-  public text: string;
-  public room: RoomDto | string;
-  public user: UserDto | string;
-
   constructor(
-    text: string,
-    room: RoomDto | string,
-    user: UserDto | string,
-    _id?: string
+    public text: string,
+    public room: RoomDto | string,
+    public user: UserDto | string,
+    public _id?: string
   ) {
     this._id = _id;
     this.text = text;
 
-    this.room = typeof room === "string" ? room : new RoomDto(room.name, room._id);
+    this.room =
+      typeof room === "string" ? room : new RoomDto(room.name, room._id);
 
     this.user =
       user && typeof user === "object" && "username" in user

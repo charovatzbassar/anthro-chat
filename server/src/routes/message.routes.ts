@@ -1,70 +1,24 @@
+import { MessageController } from "@/controllers";
 import { MessageService } from "@/services";
 import { catchAsync } from "@/utils";
-import express, { Request, Response } from "express";
+import express from "express";
 import { Router } from "express";
 
 const router: Router = express.Router();
 
-const messageService: MessageService = new MessageService();
+const controller: MessageController = new MessageController(
+  new MessageService()
+);
 
 router
   .route("/")
-  .get(
-    catchAsync(async (req: Request, res: Response) => {
-      const { room } = req.query;
-
-      if (room) {
-        const messages = await messageService.getByRoom(room as string);
-        return res.json(messages);
-      }
-
-      const messages = await messageService.getAll();
-      return res.json(messages);
-    })
-  )
-  .post(
-    catchAsync(async (req: Request, res: Response) => {
-      const { text, room, user } = req.body;
-
-      const newMessage = await messageService.create({ text, room, user });
-
-      res.json(newMessage);
-    })
-  );
+  .get(catchAsync(controller.getAll))
+  .post(catchAsync(controller.create));
 
 router
   .route("/:id")
-  .get(
-    catchAsync(async (req: Request, res: Response) => {
-      const { id } = req.params;
-
-      const message = await messageService.getById(id);
-
-      res.json(message);
-    })
-  )
-  .put(
-    catchAsync(async (req: Request, res: Response) => {
-      const { id } = req.params;
-      const { text, room, user } = req.body;
-
-      const updatedMessage = await messageService.update(id, {
-        text,
-        room,
-        user,
-      });
-
-      res.json(updatedMessage);
-    })
-  )
-  .delete(
-    catchAsync(async (req: Request, res: Response) => {
-      const { id } = req.params;
-
-      const deletedMessage = await messageService.delete(id);
-
-      res.json(deletedMessage);
-    })
-  );
+  .get(catchAsync(controller.getById))
+  .put(catchAsync(controller.update))
+  .delete(catchAsync(controller.delete));
 
 export default router;

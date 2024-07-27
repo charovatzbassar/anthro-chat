@@ -1,76 +1,22 @@
+import { UserController } from "@/controllers";
 import { UserService } from "@/services";
 import { catchAsync } from "@/utils";
-import express, { Request, Response } from "express";
-import e, { Router } from "express";
+import express from "express";
+import { Router } from "express";
 
 const router: Router = express.Router();
 
-const userService: UserService = new UserService();
+const controller: UserController = new UserController(new UserService());
 
 router
   .route("/")
-  .get(
-    catchAsync(async (req: Request, res: Response) => {
-      const { username } = req.query;
-
-      if (username) {
-        const user = await userService.getByUsername(username as string);
-        return res.json(user);
-      }
-
-      const users = await userService.getAll();
-      res.json(users);
-    })
-  )
-  .post(
-    catchAsync(async (req: Request, res: Response) => {
-      const { username, password, email } = req.body;
-
-      const existingUser = await userService.getByUsername(username);
-
-      if (existingUser) {
-        return res.json(existingUser);
-      }
-
-      const newUser = await userService.create({ username, password, email });
-
-      res.json(newUser);
-    })
-  );
+  .get(catchAsync(controller.getAll))
+  .post(catchAsync(controller.create));
 
 router
   .route("/:id")
-  .get(
-    catchAsync(async (req: Request, res: Response) => {
-      const { id } = req.params;
-
-      const user = await userService.getById(id);
-
-      res.json(user);
-    })
-  )
-  .put(
-    catchAsync(async (req: Request, res: Response) => {
-      const { id } = req.params;
-      const { username, password, email } = req.body;
-
-      const updatedUser = await userService.update(id, {
-        username,
-        password,
-        email,
-      });
-
-      res.json(updatedUser);
-    })
-  )
-  .delete(
-    catchAsync(async (req: Request, res: Response) => {
-      const { id } = req.params;
-
-      const deletedUser = await userService.delete(id);
-
-      res.json(deletedUser);
-    })
-  );
+  .get(catchAsync(controller.getById))
+  .put(catchAsync(controller.update))
+  .delete(catchAsync(controller.delete));
 
 export default router;
