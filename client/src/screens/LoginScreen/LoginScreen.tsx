@@ -45,8 +45,6 @@ const LoginScreen = (props: Props) => {
 
     const res = await AuthService.login(values as UserDto);
 
-    console.log(res);
-
     if (!res) {
       Alert.alert(
         "Invalid credentials",
@@ -58,8 +56,8 @@ const LoginScreen = (props: Props) => {
     dispatch(
       chatActions.setUser({
         user: {
-          username: values.username,
-          password: values.password,
+          username: res.username,
+          email: res.email,
         },
       })
     );

@@ -1,5 +1,6 @@
 import { UserDto } from "@/dto";
 import UserService from "./user.service";
+import { generateJwt, hashPassword } from "@/utils";
 
 class AuthService {
   constructor(private userService: UserService) {}
@@ -11,10 +12,11 @@ class AuthService {
       return null;
     }
 
-    
     delete user.password;
 
-    return user;
+    const token = generateJwt(user);
+
+    return new UserDto(user.username, user.email, undefined, token, user._id);
   };
 
   register = async (data: UserDto) => {
@@ -24,11 +26,18 @@ class AuthService {
       return null;
     }
 
-    const user = await this.userService.create(data);
+    const hashedPassword = await hashPassword(data.password || "");
+
+    const user = await this.userService.create({
+      ...data,
+      password: hashedPassword,
+    });
 
     delete user.password;
 
-    return user;
+    const token = generateJwt(user);
+
+    return new UserDto(user.username, user.email, undefined, token, user._id);
   };
 }
 

@@ -1,4 +1,6 @@
 import { TextButton } from "@/components";
+import { UserDto } from "@/dto";
+import { AuthService } from "@/services";
 import { AppDispatch } from "@/store";
 import { actions as chatActions } from "@/store/slices/chatSlice";
 import { Colors, Validation } from "@/utils";
@@ -38,12 +40,21 @@ const RegisterScreen = (props: Props) => {
       return;
     }
 
+    const res = await AuthService.register(values as UserDto);
+
+    if (!res) {
+      Alert.alert(
+        "Invalid credentials",
+        "The user already exists, please try again."
+      );
+      return;
+    }
+
     dispatch(
       chatActions.setUser({
         user: {
           username: values.username,
           email: values.email,
-          password: values.password,
         },
       })
     );
