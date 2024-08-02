@@ -3,7 +3,6 @@ import { Request, Response } from "express";
 
 class RoomController {
   constructor(private roomService: RoomService) {
-    this.roomService = roomService;
   }
 
   getAll = async (req: Request, res: Response) => {

@@ -17,6 +17,8 @@ import {
 } from "react-native";
 import { useDispatch } from "react-redux";
 import { actions as chatActions } from "@/store/slices/chatSlice";
+import { AuthService } from "@/services";
+import { UserDto } from "@/dto";
 
 type Props = StackScreenProps<RootStackParamList, "Login">;
 
@@ -36,6 +38,18 @@ const LoginScreen = (props: Props) => {
     if (!isValid) {
       Alert.alert(
         "Invalid input",
+        "Please enter a valid username and password"
+      );
+      return;
+    }
+
+    const res = await AuthService.login(values as UserDto);
+
+    console.log(res);
+
+    if (!res) {
+      Alert.alert(
+        "Invalid credentials",
         "Please enter a valid username and password"
       );
       return;

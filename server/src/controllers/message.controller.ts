@@ -3,7 +3,6 @@ import { Request, Response } from "express";
 
 class MessageController {
   constructor(private messageService: MessageService) {
-    this.messageService = messageService;
   }
 
   getAll = async (req: Request, res: Response) => {
