@@ -1,4 +1,5 @@
 import { MessageController } from "@/controllers";
+import { checkAuth } from "@/middleware";
 import { MessageService } from "@/services";
 import { catchAsync } from "@/utils";
 import express from "express";
@@ -9,6 +10,8 @@ const router: Router = express.Router();
 const controller: MessageController = new MessageController(
   new MessageService()
 );
+
+router.use(checkAuth);
 
 router
   .route("/")

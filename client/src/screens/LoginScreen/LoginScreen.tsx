@@ -19,7 +19,6 @@ import { useDispatch } from "react-redux";
 import { actions as chatActions } from "@/store/slices/chatSlice";
 import { AuthService } from "@/services";
 import { UserDto } from "@/dto";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 
 type Props = StackScreenProps<RootStackParamList, "Login">;
 

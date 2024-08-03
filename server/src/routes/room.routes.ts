@@ -1,4 +1,5 @@
 import { RoomController } from "@/controllers";
+import { checkAuth } from "@/middleware";
 import { RoomService } from "@/services";
 import { catchAsync } from "@/utils";
 import express from "express";
@@ -7,6 +8,8 @@ import { Router } from "express";
 const router: Router = express.Router();
 
 const controller: RoomController = new RoomController(new RoomService());
+
+router.use(checkAuth);
 
 router
   .route("/")
