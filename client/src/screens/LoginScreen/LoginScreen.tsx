@@ -58,6 +58,7 @@ const LoginScreen = (props: Props) => {
         user: {
           username: res.username,
           email: res.email,
+          _id: res._id,
         },
       })
     );

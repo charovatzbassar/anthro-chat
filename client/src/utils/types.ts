@@ -1,8 +1,6 @@
 import { MessageService, RoomService, UserService } from "@/services";
-import { Socket } from "socket.io-client";
 
 export type InitParams = {
-  socket: Socket;
   services: {
     messageService: MessageService;
     userService: UserService;

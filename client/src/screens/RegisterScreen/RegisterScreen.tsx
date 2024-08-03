@@ -56,6 +56,7 @@ const RegisterScreen = (props: Props) => {
         user: {
           username: values.username,
           email: values.email,
+          _id: res._id,
         },
       })
     );

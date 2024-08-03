@@ -20,7 +20,6 @@ import {
   createStackNavigator,
   StackScreenProps,
 } from "@react-navigation/stack";
-import { io } from "socket.io-client";
 import { Ionicons } from "@expo/vector-icons";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "@/store";
@@ -30,9 +29,6 @@ const Stack = createStackNavigator<RootStackParamList>();
 const Tab = createBottomTabNavigator<RootTabParamList>();
 
 const initParams: InitParams = {
-  socket: io(Constants.SERVER_URL, {
-    transports: ["websocket"],
-  }),
   services: {
     messageService: new MessageService(),
     userService: new UserService(),
@@ -111,7 +107,6 @@ const BottomTabNavigation: React.FC<BottomTabProps> = (
 };
 
 const Navigation: React.FC<{}> = () => {
-  const dispatch = useDispatch<AppDispatch>();
 
   return (
     <Stack.Navigator

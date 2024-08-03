@@ -47,6 +47,7 @@ const io: SocketIOServer = new SocketIOServer(server, {
 
 io.on("connection", (socket) => {
   const users: { [key: string]: string } = {};
+  console.log("New connection: " + socket.id);
 
   socket.on("join_room", (data) => {
     if (users[socket.id]) {
@@ -58,6 +59,8 @@ io.on("connection", (socket) => {
     }
     socket.join(data.room);
     users[socket.id] = data.room;
+
+    console.log(data.username + " joined room: " + data.room);
 
     socket.to(data.room).emit("receive_message", {
       text: `${data.username} joined the room!`,

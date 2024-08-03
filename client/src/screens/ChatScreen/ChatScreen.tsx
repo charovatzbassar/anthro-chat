@@ -20,6 +20,7 @@ import { StackScreenProps } from "@react-navigation/stack";
 import { Constants } from "@/utils";
 import { useCreateMessage, useMessagesByRoom } from "@/hooks";
 import { MessageDto } from "@/dto";
+import { io } from "socket.io-client";
 
 type Props = StackScreenProps<RootStackParamList, "Chat">;
 
@@ -34,7 +35,11 @@ type Styles = {
 const ChatScreen = (props: Props) => {
   const { room, user } = useSelector(selectChat);
 
-  const { socket, services } = props.route.params;
+  const { services } = props.route.params;
+
+  const socket = io(Constants.SERVER_URL, {
+    transports: ["websocket"],
+  });
 
   const { data: fetchedMessages, isPending: isMessagesPending } =
     useMessagesByRoom(services.messageService, room.name);
@@ -46,7 +51,6 @@ const ChatScreen = (props: Props) => {
   );
 
   const { mutate: createMessage } = useCreateMessage(services.messageService);
-
 
   let typingTimeout: NodeJS.Timeout | null = null;
 
@@ -69,33 +73,46 @@ const ChatScreen = (props: Props) => {
   }, [fetchedMessages]);
 
   useEffect(() => {
-    socket.on("receive_message", (data) => {
-      setMessages((currMessages) => [
-        ...currMessages,
-        { text: data.text, username: data.username },
-      ]);
-    });
+    socket.on("connect", () => {
+      console.log("Connected to server");
 
-    socket.on("someone_is_typing", (data) => {
-      if (typingTimeout) {
-        clearTimeout(typingTimeout);
-      }
-      setTypingUsers((currTypingUsers) => {
-        currTypingUsers.add(data.username);
-        return new Set(currTypingUsers);
+      socket.emit("join_room", {
+        room: room.name,
+        username: user.username,
       });
-      typingTimeout = setTimeout(() => {
+
+      socket.on("receive_message", (data) => {
+        setMessages((currMessages) => [
+          ...currMessages,
+          { text: data.text, username: data.username },
+        ]);
+      });
+
+      socket.on("someone_is_typing", (data) => {
+        if (typingTimeout) {
+          clearTimeout(typingTimeout);
+        }
         setTypingUsers((currTypingUsers) => {
-          currTypingUsers.delete(data.username);
+          currTypingUsers.add(data.username);
           return new Set(currTypingUsers);
         });
-      }, Constants.USER_TYPING_TIMEOUT_LENGTH);
+        typingTimeout = setTimeout(() => {
+          setTypingUsers((currTypingUsers) => {
+            currTypingUsers.delete(data.username);
+            return new Set(currTypingUsers);
+          });
+        }, Constants.USER_TYPING_TIMEOUT_LENGTH);
+      });
     });
 
     if (messagesRef.current) {
       messagesRef.current.scrollToEnd({ animated: false });
     }
-  }, [socket]);
+
+    return () => {
+      socket.disconnect();
+    };
+  }, []);
 
   const onSubmit = async (values: MessageFormValues) => {
     if (values.text === "") return;
