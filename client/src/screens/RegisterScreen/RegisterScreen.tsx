@@ -5,6 +5,7 @@ import { AppDispatch } from "@/store";
 import { actions as chatActions } from "@/store/slices/chatSlice";
 import { Colors, Validation } from "@/utils";
 import { RegisterFormValues, RootStackParamList } from "@/utils/types";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { StackScreenProps } from "@react-navigation/stack";
 import { Formik } from "formik";
 import React from "react";
@@ -58,6 +59,7 @@ const RegisterScreen = (props: Props) => {
         },
       })
     );
+    await AuthService.setToken(res.token);
     props.navigation.replace("BottomTab", props.route.params);
   };
   return (

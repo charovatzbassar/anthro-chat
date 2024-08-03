@@ -1,6 +1,6 @@
 import { UserDto } from "@/dto";
 import UserService from "./user.service";
-import { generateJwt, hashPassword } from "@/utils";
+import { comparePassword, generateJwt, hashPassword } from "@/utils";
 
 class AuthService {
   constructor(private userService: UserService) {}
@@ -9,6 +9,15 @@ class AuthService {
     const user = await this.userService.getByUsername(data.username);
 
     if (!user) {
+      return null;
+    }
+
+    const isPasswordValid = await comparePassword(
+      data.password || "",
+      user.password || ""
+    );
+
+    if (!isPasswordValid) {
       return null;
     }
 
