@@ -48,7 +48,11 @@ const MyRoomItem = (props: Props) => {
           {roomUsers && roomUsers.length > 20 && (
             <Text>Too many users to display</Text>
           )}
-          <TextButton text="close" onPress={() => setModalVisible(false)} color="red" />
+          <TextButton
+            text="close"
+            onPress={() => setModalVisible(false)}
+            color="red"
+          />
         </View>
       </Modal>
     </View>
