@@ -1,5 +1,5 @@
-import { UserModel } from "@/models";
-import { UserDto } from "@/dto";
+import { RoomUserModel, UserModel } from "@/models";
+import { RoomUserDto, UserDto } from "@/dto";
 import { BaseService } from "./BaseService";
 
 class UserService implements BaseService<UserDto> {
@@ -21,6 +21,20 @@ class UserService implements BaseService<UserDto> {
 
   public getByUsername = async (username: string): Promise<UserDto | null> =>
     await UserModel.findOne({ username });
+
+  public joinRoom = async (
+    userId: string,
+    roomId: string
+  ): Promise<RoomUserDto | null> => {
+    const existingRoomUser = await RoomUserModel.findOne({
+      user: userId,
+      room: roomId,
+    });
+
+    if (existingRoomUser) return existingRoomUser;
+
+    return await RoomUserModel.create({ user: userId, room: roomId });
+  };
 }
 
 export default UserService;

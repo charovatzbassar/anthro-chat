@@ -16,6 +16,8 @@ router
   .get(catchAsync(controller.getAll))
   .post(catchAsync(controller.create));
 
+router.route("/join").post(catchAsync(controller.joinRoom));
+
 router
   .route("/:id")
   .get(catchAsync(controller.getById))

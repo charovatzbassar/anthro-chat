@@ -62,6 +62,14 @@ class UserController {
 
     res.json(deletedUser);
   };
+
+  joinRoom = async (req: Request, res: Response) => {
+    const { userId, roomId } = req.body;
+
+    const roomUser = await this.userService.joinRoom(userId, roomId);
+
+    res.json(roomUser);
+  };
 }
 
 export default UserController;

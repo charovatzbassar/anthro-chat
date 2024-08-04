@@ -1,5 +1,5 @@
 import { MyRoomItem, TextButton } from "@/components";
-import { useCreateRoom, useRoomsByUser } from "@/hooks";
+import { useCreateRoom, useJoinUser, useRoomsByUser } from "@/hooks";
 import { AppDispatch } from "@/store";
 import { actions as chatActions, selectChat } from "@/store/slices/chatSlice";
 import { Colors } from "@/utils";
@@ -22,6 +22,7 @@ type Props = BottomTabScreenProps<RootTabParamList, "MyRooms">;
 const MyRoomsScreen = (props: Props) => {
   const { services, goToChatScreen } = props.route.params;
   const { user } = useSelector(selectChat);
+  const { mutate: join } = useJoinUser(services.userService);
 
   const {
     data: rooms,
@@ -37,6 +38,7 @@ const MyRoomsScreen = (props: Props) => {
     if (values.name === "") return;
 
     createRoom({ name: values.name });
+
     values.name = "";
   };
 
@@ -54,10 +56,14 @@ const MyRoomsScreen = (props: Props) => {
           data={rooms}
           keyExtractor={(item) => item._id || ""}
           renderItem={({ item }) => (
-            <MyRoomItem room={item} onPress={() => {
-              dispatch(chatActions.setRoom({ room: item }));
-              goToChatScreen();
-            }} />
+            <MyRoomItem
+              room={item}
+              onPress={() => {
+                join({ userId: user._id || "", roomId: item._id || "" });
+                dispatch(chatActions.setRoom({ room: item }));
+                goToChatScreen();
+              }}
+            />
           )}
         />
       )}

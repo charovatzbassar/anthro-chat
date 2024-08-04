@@ -6,3 +6,4 @@ export { default as useCreateMessage } from "./useCreateMessage";
 export { default as useRooms } from "./useRooms";
 export { default as useRoomsByUser } from "./useRoomsByUser";
 export { default as useRoomUserCount } from "./useRoomUserCount";
+export { default as useJoinUser } from "./useJoinUser";
