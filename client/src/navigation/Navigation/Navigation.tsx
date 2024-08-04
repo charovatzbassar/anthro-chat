@@ -9,7 +9,6 @@ import {
 } from "@/screens";
 import { MessageService, UserService, RoomService } from "@/services";
 import { Colors } from "@/utils";
-import { Constants } from "@/utils";
 import {
   InitParams,
   RootStackParamList,
@@ -107,7 +106,6 @@ const BottomTabNavigation: React.FC<BottomTabProps> = (
 };
 
 const Navigation: React.FC<{}> = () => {
-
   return (
     <Stack.Navigator
       initialRouteName="Login"

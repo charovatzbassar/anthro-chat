@@ -47,7 +47,6 @@ const io: SocketIOServer = new SocketIOServer(server, {
 
 io.on("connection", (socket) => {
   const users: { [key: string]: string } = {};
-  console.log("New connection: " + socket.id);
 
   socket.on("join_room", (data) => {
     if (users[socket.id]) {
@@ -60,20 +59,9 @@ io.on("connection", (socket) => {
     socket.join(data.room);
     users[socket.id] = data.room;
 
-    console.log(data.username + " joined room: " + data.room);
-
     socket.to(data.room).emit("receive_message", {
       text: `${data.username} joined the room!`,
       username: "Server",
-    });
-
-    socket.on("user_typing", (data) => {
-      if (data.userIsTyping) {
-        socket.broadcast.to(data.room).emit("someone_is_typing", {
-          username: data.username,
-          room: data.room,
-        });
-      }
     });
 
     socket.on("disconnect", () => {
@@ -90,6 +78,15 @@ io.on("connection", (socket) => {
 
   socket.on("send_message", (data) => {
     socket.to(data.room).emit("receive_message", data);
+  });
+
+  socket.on("user_typing", (data) => {
+    if (data.userIsTyping) {
+      socket.broadcast.to(data.room).emit("someone_is_typing", {
+        username: data.username,
+        room: data.room,
+      });
+    }
   });
 });
 

@@ -52,6 +52,12 @@ const ChatScreen = (props: Props) => {
 
   const { mutate: createMessage } = useCreateMessage(services.messageService);
 
+  const scrollToEnd = () => {
+    if (messagesRef.current) {
+      messagesRef.current.scrollToEnd({ animated: true });
+    }
+  };
+
   let typingTimeout: NodeJS.Timeout | null = null;
 
   props.navigation.setOptions({ title: room.name });
@@ -73,41 +79,35 @@ const ChatScreen = (props: Props) => {
   }, [fetchedMessages]);
 
   useEffect(() => {
-    socket.on("connect", () => {
-      console.log("Connected to server");
-
-      socket.emit("join_room", {
-        room: room.name,
-        username: user.username,
-      });
-
-      socket.on("receive_message", (data) => {
-        setMessages((currMessages) => [
-          ...currMessages,
-          { text: data.text, username: data.username },
-        ]);
-      });
-
-      socket.on("someone_is_typing", (data) => {
-        if (typingTimeout) {
-          clearTimeout(typingTimeout);
-        }
-        setTypingUsers((currTypingUsers) => {
-          currTypingUsers.add(data.username);
-          return new Set(currTypingUsers);
-        });
-        typingTimeout = setTimeout(() => {
-          setTypingUsers((currTypingUsers) => {
-            currTypingUsers.delete(data.username);
-            return new Set(currTypingUsers);
-          });
-        }, Constants.USER_TYPING_TIMEOUT_LENGTH);
-      });
+    socket.emit("join_room", {
+      room: room.name,
+      username: user.username,
     });
 
-    if (messagesRef.current) {
-      messagesRef.current.scrollToEnd({ animated: false });
-    }
+    socket.on("receive_message", (data) => {
+      setMessages((currMessages) => [
+        ...currMessages,
+        { text: data.text, username: data.username },
+      ]);
+      scrollToEnd();
+    });
+
+    socket.on("someone_is_typing", (data) => {
+      if (typingTimeout) {
+        clearTimeout(typingTimeout);
+      }
+      setTypingUsers((currTypingUsers) => {
+        if (user.username !== data.username) {
+          currTypingUsers.add(data.username);
+        }
+        return new Set(currTypingUsers);
+      });
+      typingTimeout = setTimeout(() => {
+        setTypingUsers(() => {
+          return new Set();
+        });
+      }, Constants.USER_TYPING_TIMEOUT_LENGTH);
+    });
 
     return () => {
       socket.disconnect();
@@ -129,6 +129,7 @@ const ChatScreen = (props: Props) => {
       { username: user.username, text: values.text },
     ]);
     values.text = "";
+    scrollToEnd();
   };
 
   return (
@@ -162,9 +163,7 @@ const ChatScreen = (props: Props) => {
       </Formik>
       {typingUsers.size > 0 && (
         <Text style={styles.typingText}>
-          {typingUsers.size <= 2
-            ? Array.from(typingUsers).join(", ") + " is typing..."
-            : "Several users are typing..."}
+          {Array.from(typingUsers).join(", ")} is typing...
         </Text>
       )}
       <ScrollView style={styles.messages} ref={messagesRef}>
