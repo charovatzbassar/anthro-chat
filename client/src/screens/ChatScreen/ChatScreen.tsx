@@ -85,7 +85,6 @@ const ChatScreen = (props: Props) => {
     });
 
     socket.on("receive_message", (data) => {
-
       if (data.username === user.username) return;
 
       setMessages((currMessages) => [

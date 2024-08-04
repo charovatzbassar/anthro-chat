@@ -57,6 +57,7 @@ const MyRoomsScreen = (props: Props) => {
           keyExtractor={(item) => item._id || ""}
           renderItem={({ item }) => (
             <MyRoomItem
+            userService={services.userService}
               room={item}
               onPress={() => {
                 join({ userId: user._id || "", roomId: item._id || "" });
