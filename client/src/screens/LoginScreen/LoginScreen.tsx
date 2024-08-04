@@ -17,6 +17,8 @@ import {
 } from "react-native";
 import { useDispatch } from "react-redux";
 import { actions as chatActions } from "@/store/slices/chatSlice";
+import { AuthService } from "@/services";
+import { UserDto } from "@/dto";
 
 type Props = StackScreenProps<RootStackParamList, "Login">;
 
@@ -41,14 +43,26 @@ const LoginScreen = (props: Props) => {
       return;
     }
 
+    const res = await AuthService.login(values as UserDto);
+
+    if (!res) {
+      Alert.alert(
+        "Invalid credentials",
+        "Please enter a valid username and password"
+      );
+      return;
+    }
+
     dispatch(
       chatActions.setUser({
         user: {
-          username: values.username,
-          password: values.password,
+          username: res.username,
+          email: res.email,
+          _id: res._id,
         },
       })
     );
+    await AuthService.setToken(res.token);
     props.navigation.replace("BottomTab", props.route.params);
   };
 

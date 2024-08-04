@@ -4,7 +4,7 @@ import { Server as SocketIOServer } from "socket.io";
 import cors from "cors";
 import mongoose from "mongoose";
 import { ExpressError } from "@/utils";
-import { messageRoutes, roomRoutes, userRoutes } from "@/routes";
+import { authRoutes, messageRoutes, roomRoutes, userRoutes } from "@/routes";
 import mongoSanitize from "express-mongo-sanitize";
 import dotenv from "dotenv";
 
@@ -64,15 +64,6 @@ io.on("connection", (socket) => {
       username: "Server",
     });
 
-    socket.on("user_typing", (data) => {
-      if (data.userIsTyping) {
-        socket.broadcast.to(data.room).emit("someone_is_typing", {
-          username: data.username,
-          room: data.room,
-        });
-      }
-    });
-
     socket.on("disconnect", () => {
       if (users[socket.id]) {
         socket.leave(users[socket.id]);
@@ -88,8 +79,18 @@ io.on("connection", (socket) => {
   socket.on("send_message", (data) => {
     socket.to(data.room).emit("receive_message", data);
   });
+
+  socket.on("user_typing", (data) => {
+    if (data.userIsTyping) {
+      socket.broadcast.to(data.room).emit("someone_is_typing", {
+        username: data.username,
+        room: data.room,
+      });
+    }
+  });
 });
 
+app.use("/api/auth", authRoutes);
 app.use("/api/messages", messageRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/rooms", roomRoutes);

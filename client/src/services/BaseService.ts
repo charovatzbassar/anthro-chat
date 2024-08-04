@@ -1,9 +1,7 @@
 import { RestClient } from "@/utils";
 
 export class BaseService<T> {
-  constructor(private _endpoint: string) {
-    this._endpoint = _endpoint;
-  }
+  constructor(private _endpoint: string) {}
 
   create = (data: T): Promise<T> => RestClient.post(this._endpoint, data);
 

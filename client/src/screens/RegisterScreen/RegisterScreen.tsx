@@ -1,8 +1,11 @@
 import { TextButton } from "@/components";
+import { UserDto } from "@/dto";
+import { AuthService } from "@/services";
 import { AppDispatch } from "@/store";
 import { actions as chatActions } from "@/store/slices/chatSlice";
 import { Colors, Validation } from "@/utils";
 import { RegisterFormValues, RootStackParamList } from "@/utils/types";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { StackScreenProps } from "@react-navigation/stack";
 import { Formik } from "formik";
 import React from "react";
@@ -38,15 +41,26 @@ const RegisterScreen = (props: Props) => {
       return;
     }
 
+    const res = await AuthService.register(values as UserDto);
+
+    if (!res) {
+      Alert.alert(
+        "Invalid credentials",
+        "The user already exists, please try again."
+      );
+      return;
+    }
+
     dispatch(
       chatActions.setUser({
         user: {
           username: values.username,
           email: values.email,
-          password: values.password,
+          _id: res._id,
         },
       })
     );
+    await AuthService.setToken(res.token);
     props.navigation.replace("BottomTab", props.route.params);
   };
   return (

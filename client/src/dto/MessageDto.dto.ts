@@ -8,9 +8,6 @@ class MessageDto {
     public user: UserDto | string,
     public _id?: string
   ) {
-    this._id = _id;
-    this.text = text;
-
     this.room =
       typeof room === "string" ? room : new RoomDto(room.name, room._id);
 

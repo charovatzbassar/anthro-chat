@@ -2,12 +2,11 @@ import { MessageService } from "@/services";
 import { Request, Response } from "express";
 
 class MessageController {
-  constructor(private messageService: MessageService) {
-    this.messageService = messageService;
-  }
+  constructor(private messageService: MessageService) {}
 
   getAll = async (req: Request, res: Response) => {
     const { room } = req.query;
+    const { user } = req.body;
 
     if (room) {
       const messages = await this.messageService.getByRoom(room as string);

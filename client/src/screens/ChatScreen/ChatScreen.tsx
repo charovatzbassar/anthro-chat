@@ -20,6 +20,7 @@ import { StackScreenProps } from "@react-navigation/stack";
 import { Constants } from "@/utils";
 import { useCreateMessage, useMessagesByRoom } from "@/hooks";
 import { MessageDto } from "@/dto";
+import { io } from "socket.io-client";
 
 type Props = StackScreenProps<RootStackParamList, "Chat">;
 
@@ -34,7 +35,11 @@ type Styles = {
 const ChatScreen = (props: Props) => {
   const { room, user } = useSelector(selectChat);
 
-  const { socket, services } = props.route.params;
+  const { services } = props.route.params;
+
+  const socket = io(Constants.SERVER_URL, {
+    transports: ["websocket"],
+  });
 
   const { data: fetchedMessages, isPending: isMessagesPending } =
     useMessagesByRoom(services.messageService, room.name);
@@ -47,6 +52,11 @@ const ChatScreen = (props: Props) => {
 
   const { mutate: createMessage } = useCreateMessage(services.messageService);
 
+  const scrollToEnd = () => {
+    if (messagesRef.current) {
+      messagesRef.current.scrollToEnd({ animated: true });
+    }
+  };
 
   let typingTimeout: NodeJS.Timeout | null = null;
 
@@ -69,11 +79,20 @@ const ChatScreen = (props: Props) => {
   }, [fetchedMessages]);
 
   useEffect(() => {
+    socket.emit("join_room", {
+      room: room.name,
+      username: user.username,
+    });
+
     socket.on("receive_message", (data) => {
+
+      if (data.username === user.username) return;
+
       setMessages((currMessages) => [
         ...currMessages,
         { text: data.text, username: data.username },
       ]);
+      scrollToEnd();
     });
 
     socket.on("someone_is_typing", (data) => {
@@ -81,21 +100,22 @@ const ChatScreen = (props: Props) => {
         clearTimeout(typingTimeout);
       }
       setTypingUsers((currTypingUsers) => {
-        currTypingUsers.add(data.username);
+        if (user.username !== data.username) {
+          currTypingUsers.add(data.username);
+        }
         return new Set(currTypingUsers);
       });
       typingTimeout = setTimeout(() => {
-        setTypingUsers((currTypingUsers) => {
-          currTypingUsers.delete(data.username);
-          return new Set(currTypingUsers);
+        setTypingUsers(() => {
+          return new Set();
         });
       }, Constants.USER_TYPING_TIMEOUT_LENGTH);
     });
 
-    if (messagesRef.current) {
-      messagesRef.current.scrollToEnd({ animated: false });
-    }
-  }, [socket]);
+    return () => {
+      socket.disconnect();
+    };
+  }, []);
 
   const onSubmit = async (values: MessageFormValues) => {
     if (values.text === "") return;
@@ -112,6 +132,7 @@ const ChatScreen = (props: Props) => {
       { username: user.username, text: values.text },
     ]);
     values.text = "";
+    scrollToEnd();
   };
 
   return (
@@ -145,9 +166,7 @@ const ChatScreen = (props: Props) => {
       </Formik>
       {typingUsers.size > 0 && (
         <Text style={styles.typingText}>
-          {typingUsers.size <= 2
-            ? Array.from(typingUsers).join(", ") + " is typing..."
-            : "Several users are typing..."}
+          {Array.from(typingUsers).join(", ")} is typing...
         </Text>
       )}
       <ScrollView style={styles.messages} ref={messagesRef}>

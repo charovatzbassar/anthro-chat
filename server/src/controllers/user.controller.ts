@@ -2,9 +2,7 @@ import { UserService } from "@/services";
 import { Request, Response } from "express";
 
 class UserController {
-  constructor(private userService: UserService) {
-    this.userService = userService;
-  }
+  constructor(private userService: UserService) {}
 
   getAll = async (req: Request, res: Response) => {
     const { username } = req.query;
@@ -63,6 +61,14 @@ class UserController {
     const deletedUser = await this.userService.delete(id);
 
     res.json(deletedUser);
+  };
+
+  joinRoom = async (req: Request, res: Response) => {
+    const { userId, roomId } = req.body;
+
+    const roomUser = await this.userService.joinRoom(userId, roomId);
+
+    res.json(roomUser);
   };
 }
 
