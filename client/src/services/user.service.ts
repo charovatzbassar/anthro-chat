@@ -15,6 +15,9 @@ class UserService extends BaseService<UserDto> {
       userId: data.userId,
       roomId: data.roomId,
     });
+
+  getByRoomId = (roomId: string): Promise<UserDto[]> =>
+    RestClient.get(`${super.endpoint}?room=${roomId}`);
 }
 
 export default UserService;

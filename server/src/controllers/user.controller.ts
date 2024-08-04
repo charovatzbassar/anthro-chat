@@ -5,11 +5,16 @@ class UserController {
   constructor(private userService: UserService) {}
 
   getAll = async (req: Request, res: Response) => {
-    const { username } = req.query;
+    const { username, room } = req.query;
 
     if (username) {
       const user = await this.userService.getByUsername(username as string);
       return res.json(user);
+    }
+
+    if (room) {
+      const users = await this.userService.getByRoomId(room as string);
+      return res.json(users);
     }
 
     const users = await this.userService.getAll();
@@ -70,6 +75,7 @@ class UserController {
 
     res.json(roomUser);
   };
+
 }
 
 export default UserController;

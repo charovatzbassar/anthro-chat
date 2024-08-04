@@ -1,6 +1,7 @@
 import { RoomUserModel, UserModel } from "@/models";
 import { RoomUserDto, UserDto } from "@/dto";
 import { BaseService } from "./BaseService";
+import { ObjectId } from "mongodb";
 
 class UserService implements BaseService<UserDto> {
   public create = async (data: UserDto): Promise<UserDto> =>
@@ -34,6 +35,14 @@ class UserService implements BaseService<UserDto> {
     if (existingRoomUser) return existingRoomUser;
 
     return await RoomUserModel.create({ user: userId, room: roomId });
+  };
+
+  public getByRoomId = async (roomId: string): Promise<ObjectId[]> => {
+    const roomUsers = await RoomUserModel.find({ room: roomId }).populate(
+      "user"
+    );
+
+    return roomUsers.map((roomUser) => roomUser.user);
   };
 }
 
