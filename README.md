@@ -11,3 +11,5 @@
 > On the backend, the REST API was created using Express.js. The chat server itself utilises Socket.IO for real-time communication between clients. It is further accompanied with:
 > * Mongoose for modeling and fetching data from a Mongo instance
 > * JWT authentication
+>   
+> The code itself utilises all the best practices and architectural patterns. 
