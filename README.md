@@ -7,6 +7,7 @@
 > * Tanstack Query for data fetching and state management
 > * Redux for global state management
 > * Formik and Yup for form management and validation
+> * Axios for handling HTTP requests
 >   
 > On the backend, the REST API was created using Express.js. The chat server itself utilises Socket.IO for real-time communication between clients. It is further accompanied with:
 > * Mongoose for modeling and fetching data from a Mongo instance
